@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - update changelog
 - update changelog
 - update changelog
+- update changelog
 - 新增纯go语言实现的自动changelog功能
 - 修订git-chglog配置文件
 - 增加chglog模板
