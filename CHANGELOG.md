@@ -1,0 +1,18 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+
+## [1.0.1] - 2024-05-28
+### Changed
+- 增加chglog模板
+
+## [1.0.0] - 2024-05-28
+### Changed
+
+
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.1...HEAD
+[1.0.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.0...v1.0.1
+[1.0.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.2...v1.0.0
+[1.0.2]: https://gitee.com/quant1x/autochangelog.git/releases/tag/v1.0.2
