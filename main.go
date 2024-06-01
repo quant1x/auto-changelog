@@ -81,7 +81,10 @@ func main() {
 	slices.SortFunc(allCommits, func(a, b Commit) int {
 		return int(a.Time.UnixMilli() - b.Time.UnixMilli())
 	})
-	fmt.Printf("commits： %+v\n", allCommits)
+	lastCommitId := allCommits[len(allCommits)-1].Id
+	//fmt.Printf("lastCommitId: %s\n", lastCommitId)
+	//os.Exit(1)
+	//fmt.Printf("commits： %+v\n", allCommits)
 	iter, err := r.Tags()
 	if err != nil {
 		panic(err)
@@ -124,10 +127,11 @@ func main() {
 			RepositoryURL: repositoryURL,
 			Oldest:        oldest,
 		}
-		//c, _ := obj.Commit()
+		c, _ := obj.Commit()
 		//version.Time = c.Committer.When
 		version.Time = tagTime
-		fmt.Println(lastTime, version.Time)
+		version.CommitId = c.Hash.String()
+		//fmt.Println(lastTime, version.Time)
 		version.Commits = Filter(allCommits, func(commit Commit) bool {
 			tm := commit.Time
 			c1 := tm.After(lastTime) && !tm.After(version.Time)
@@ -144,7 +148,12 @@ func main() {
 	slices.SortFunc(allVersions, func(a, b Version) int {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
-	fmt.Printf("%+v\n", allVersions)
+	//fmt.Printf("%+v\n", allVersions)
+	lastTagCommitId := allVersions[len(allVersions)-1].CommitId
+	if lastTagCommitId == lastCommitId {
+		fmt.Println("tag无变化")
+		os.Exit(0)
+	}
 	tmpl, err := template.New("ChangeLog").Parse(templateChangeLog)
 	if err != nil {
 		panic(err)

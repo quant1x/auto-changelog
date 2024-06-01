@@ -16,6 +16,7 @@ type Version struct {
 	Previous      string
 	RepositoryURL string
 	Oldest        string
+	CommitId      string
 	Commits       []Commit
 }
 
