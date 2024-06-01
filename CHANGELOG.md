@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - update changelog
 - update changelog
 - update changelog
+- update changelog
 
 ## [1.0.2] - 2024-06-01
 ### Changed
