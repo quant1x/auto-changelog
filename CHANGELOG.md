@@ -4,12 +4,17 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.14] - 2024-06-01
+### Changed
+- 优化自动新增修订版本号的changelog逻辑
+
 ## [1.0.13] - 2024-06-01
 ### Changed
 - 修订README,2
 
 ## [1.0.12] - 2024-06-01
 ### Changed
+- update changelog
 
 ## [1.0.11] - 2024-06-01
 ### Changed
@@ -103,7 +108,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.12...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.13...HEAD
+[1.0.14]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.13...v1.0.14
 [1.0.13]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.12...v1.0.13
 [1.0.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.11...v1.0.12
 [1.0.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.10...v1.0.11
