@@ -6,10 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.27] - 2024-06-01
 ### Changed
+- 修订README-5
 
 ## [1.0.26] - 2024-06-01
 ### Changed
 - 修订README-4
+- update changelog
 
 ## [1.0.25] - 2024-06-01
 ### Changed
