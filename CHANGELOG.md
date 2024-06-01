@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.7] - 2024-06-01
+### Changed
+- 新增自动增加修订版本号的逻辑
+
 ## [1.0.6] - 2024-06-01
 ### Changed
 
@@ -34,7 +38,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.6...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.7...HEAD
+[1.0.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.6...v1.0.7
 [1.0.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.5...v1.0.6
 [1.0.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.4...v1.0.5
 [1.0.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.3...v1.0.4
