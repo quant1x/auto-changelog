@@ -60,3 +60,15 @@ func cmpVersion(a, b string) int {
 	}
 	return 0
 }
+
+func incrVersion(v string) string {
+	vs := parseVersion(v)
+	pos := len(vs) - 1
+	patchVersion := vs[pos] + 1
+	vs[pos] = patchVersion
+	version := ""
+	for _, v := range vs {
+		version += "." + strconv.Itoa(v)
+	}
+	return version[1:]
+}

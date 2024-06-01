@@ -45,15 +45,15 @@ func main() {
 	}
 	fmt.Println(currentPath)
 	r, err := git.PlainOpen(currentPath)
-	fmt.Println(err)
-	fmt.Printf("%+v\n", r)
+	//fmt.Println(err)
+	//fmt.Printf("%+v\n", r)
 	remotes, err := r.Remotes()
 	if err != nil {
 		panic(err)
 	}
 	remote := remotes[0]
 	cfg := remote.Config()
-	fmt.Printf("%+v\n", cfg)
+	//fmt.Printf("%+v\n", cfg)
 	repositoryURL := cfg.URLs[0]
 	// 获取HEAD历史记录
 	ref, err := r.Head()
@@ -130,7 +130,8 @@ func main() {
 		c, _ := obj.Commit()
 		//version.Time = c.Committer.When
 		version.Time = tagTime
-		version.CommitId = c.Hash.String()
+		version.CommitId = c.ID().String()
+		//fmt.Println(c.Hash, c.ID(), c.ParentHashes)
 		//fmt.Println(lastTime, version.Time)
 		version.Commits = Filter(allCommits, func(commit Commit) bool {
 			tm := commit.Time
@@ -149,11 +150,13 @@ func main() {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
 	//fmt.Printf("%+v\n", allVersions)
-	lastTagCommitId := allVersions[len(allVersions)-1].CommitId
+	lastTagCommitId := allVersions[0].CommitId
+	//fmt.Println(lastTagCommitId, lastCommitId)
 	if lastTagCommitId == lastCommitId {
 		fmt.Println("tag无变化")
 		os.Exit(0)
 	}
+	//os.Exit(0)
 	tmpl, err := template.New("ChangeLog").Parse(templateChangeLog)
 	if err != nil {
 		panic(err)
@@ -197,5 +200,17 @@ func main() {
 	}
 	fmt.Printf("%+v\n", obj)
 	err = r.Push(&git.PushOptions{})
+	fmt.Printf("%+v\n", err)
+	h, err := r.Head()
+	if err != nil {
+		fmt.Printf("get HEAD error: %s", err)
+		os.Exit(1)
+	}
+	newVersion := incrVersion(latest)
+	tag := fmt.Sprintf("v%s", newVersion)
+	message := fmt.Sprintf("Release version %s", newVersion)
+	_, err = r.CreateTag(tag, h.Hash(), &git.CreateTagOptions{
+		Message: message,
+	})
 	fmt.Printf("%+v\n", err)
 }
