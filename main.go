@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
 
 [Unreleased]: {{.RepositoryURL}}/compare/v{{.Latest}}...HEAD
 {{- range .Versions}}
-[{{.Version}}]: {{.RepositoryURL}}/compare/v{{.Previous}}...v{{.Version}}
+{{if ne .Version .Oldest}}[{{.Version}}]: {{.RepositoryURL}}/compare/v{{.Previous}}...v{{.Version}}{{- end}}
 {{- end}}
 [{{.Oldest}}]: {{.RepositoryURL}}/releases/tag/v{{.Oldest}}
 `
@@ -70,14 +70,18 @@ func main() {
 		hash := c.ID()
 		commit := Commit{
 			Id:      hash.String(),
-			Author:  c.Author.Name,
-			Time:    c.Author.When,
+			Author:  c.Committer.Name,
+			Time:    c.Committer.When,
 			Message: strings.TrimSpace(c.Message),
 		}
+		//fmt.Println(commit)
 		allCommits = append(allCommits, commit)
 		return nil
 	})
-	fmt.Printf("%+v\n", allCommits)
+	slices.SortFunc(allCommits, func(a, b Commit) int {
+		return int(a.Time.UnixMilli() - b.Time.UnixMilli())
+	})
+	fmt.Printf("commits： %+v\n", allCommits)
 	iter, err := r.Tags()
 	if err != nil {
 		panic(err)
@@ -118,15 +122,20 @@ func main() {
 			Previous:      lastVersion,
 			Date:          tagDate,
 			RepositoryURL: repositoryURL,
+			Oldest:        oldest,
 		}
-		c, _ := obj.Commit()
-		version.Time = c.Author.When
+		//c, _ := obj.Commit()
+		//version.Time = c.Committer.When
+		version.Time = tagTime
+		fmt.Println(lastTime, version.Time)
 		version.Commits = Filter(allCommits, func(commit Commit) bool {
 			tm := commit.Time
-			return tm.After(lastTime) && !tm.After(version.Time)
+			c1 := tm.After(lastTime) && !tm.After(version.Time)
+			c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
+			return c1 && c2
 		})
 		lastSignature = obj.Tagger
-		if latest != defaultFirstVersion {
+		if latest != defaultFirstVersion /*&& latest != oldest*/ {
 			allVersions = append(allVersions, version)
 		}
 		lastTime = version.Time
