@@ -4,8 +4,13 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.11] - 2024-06-01
+### Changed
+- 修订README,1
+
 ## [1.0.10] - 2024-06-01
 ### Changed
+- update changelog
 
 ## [1.0.9] - 2024-06-01
 ### Changed
@@ -89,12 +94,12 @@ All notable changes to this project will be documented in this file.
 - add main application
 - add README
 
-## [1.0.11] - 2024-06-01
+## [1.0.12] - 2024-06-01
 ### Changed
-- 修订README,1
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.10...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.11...HEAD
+[1.0.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.10...v1.0.11
 [1.0.10]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.9...v1.0.10
 [1.0.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.8...v1.0.9
 [1.0.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.7...v1.0.8
@@ -106,5 +111,5 @@ All notable changes to this project will be documented in this file.
 [1.0.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.1...v1.0.2
 [1.0.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.0...v1.0.1
 
-[1.0.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.10...v1.0.11
+[1.0.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.11...v1.0.12
 [1.0.0]: https://gitee.com/quant1x/autochangelog.git/releases/tag/v1.0.0
