@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.32] - 2024-06-01
+### Changed
+- 调整控制台展示信息
+
 ## [1.0.31] - 2024-06-01
 ### Changed
 - 屏蔽git push的操作
@@ -11,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.30] - 2024-06-01
 ### Changed
 - 修订README
+- update changelog
 
 ## [1.0.29] - 2024-06-01
 ### Changed
@@ -188,7 +193,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.30...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.31...HEAD
+[1.0.32]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.31...v1.0.32
 [1.0.31]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.30...v1.0.31
 [1.0.30]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.29...v1.0.30
 [1.0.29]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.28...v1.0.29
