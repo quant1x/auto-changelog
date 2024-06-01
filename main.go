@@ -45,6 +45,9 @@ func main() {
 	}
 	fmt.Println(currentPath)
 	r, err := git.PlainOpen(currentPath)
+	if err != nil {
+		panic(err)
+	}
 	//fmt.Println(err)
 	//fmt.Printf("%+v\n", r)
 	remotes, err := r.Remotes()
