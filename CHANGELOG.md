@@ -6,25 +6,39 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.3] - 2024-06-01
 ### Changed
+- tag按照版本规则排序
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
 - update changelog
 - update changelog
 - update changelog
 
 ## [1.0.2] - 2024-06-01
 ### Changed
-- update changelog
-- update changelog
-- update changelog
-- update changelog
-- update changelog
-- update changelog
-- update changelog
 - 修订git-chglog配置文件
 - 新增纯go语言实现的自动changelog功能
+- update changelog
+- update changelog
+- update changelog
 
 ## [1.0.1] - 2024-05-28
 ### Changed
 - 增加chglog模板
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
 
 ## [1.0.0] - 2024-05-28
 ### Changed
