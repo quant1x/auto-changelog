@@ -4,12 +4,17 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.22] - 2024-06-01
+### Changed
+- 修订README-2
+
 ## [1.0.21] - 2024-06-01
 ### Changed
 
 ## [1.0.20] - 2024-06-01
 ### Changed
 - 修订README
+- update changelog
 
 ## [1.0.19] - 2024-06-01
 ### Changed
@@ -139,7 +144,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.20...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.21...HEAD
+[1.0.22]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.21...v1.0.22
 [1.0.21]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.20...v1.0.21
 [1.0.20]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.19...v1.0.20
 [1.0.19]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.18...v1.0.19
