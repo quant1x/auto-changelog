@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.4] - 2024-06-01
+### Changed
+- 去掉changelog的更新日志
+- 新增判断是否有新提交的情况
+
 ## [1.0.3] - 2024-06-01
 ### Changed
 - tag按照版本规则排序
@@ -23,7 +28,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.3...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.4...HEAD
+[1.0.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.3...v1.0.4
 [1.0.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.2...v1.0.3
 [1.0.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.1...v1.0.2
 [1.0.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.0...v1.0.1
