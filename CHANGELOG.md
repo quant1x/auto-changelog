@@ -9,13 +9,12 @@ All notable changes to this project will be documented in this file.
 - update changelog
 - update changelog
 - update changelog
+- update changelog
+- update changelog
+- tag按照版本规则排序
 
 ## [1.0.2] - 2024-06-01
 ### Changed
-- update changelog
-- update changelog
-- update changelog
-- update changelog
 - update changelog
 - update changelog
 - update changelog
@@ -24,6 +23,13 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.1] - 2024-05-28
 ### Changed
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
 - 增加chglog模板
 
 ## [1.0.0] - 2024-05-28
