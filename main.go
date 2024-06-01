@@ -240,6 +240,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 	} else {
-		fmt.Println("OK.")
+		fmt.Println("Auto ChangeLog, OK.")
 	}
 }
