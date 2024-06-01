@@ -4,33 +4,75 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.8] - 2024-06-01
+### Changed
+
 ## [1.0.7] - 2024-06-01
 ### Changed
 - 新增自动增加修订版本号的逻辑
+- update changelog
 
 ## [1.0.6] - 2024-06-01
 ### Changed
+- update changelog
 
 ## [1.0.5] - 2024-06-01
 ### Changed
+- update changelog
 
 ## [1.0.4] - 2024-06-01
 ### Changed
 - 去掉changelog的更新日志
 - 新增判断是否有新提交的情况
+- update changelog
+- update changelog
+- update changelog
 
 ## [1.0.3] - 2024-06-01
 ### Changed
 - tag按照版本规则排序
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
 
 ## [1.0.2] - 2024-06-01
 ### Changed
 - 修订git-chglog配置文件
 - 新增纯go语言实现的自动changelog功能
+- update changelog
+- update changelog
+- update changelog
 
 ## [1.0.1] - 2024-05-28
 ### Changed
 - 增加chglog模板
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
+- update changelog
 
 ## [1.0.0] - 2024-05-28
 ### Changed
@@ -38,7 +80,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.7...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.8...HEAD
+[1.0.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.7...v1.0.8
 [1.0.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.6...v1.0.7
 [1.0.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.5...v1.0.6
 [1.0.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.4...v1.0.5
