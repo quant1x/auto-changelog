@@ -136,8 +136,9 @@ func main() {
 		version.Commits = Filter(allCommits, func(commit Commit) bool {
 			tm := commit.Time
 			c1 := tm.After(lastTime) && !tm.After(version.Time)
-			c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
-			return c1 && c2
+			//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
+			//return c1 && c2
+			return c1
 		})
 		lastSignature = obj.Tagger
 		if latest != defaultFirstVersion /*&& latest != oldest*/ {
