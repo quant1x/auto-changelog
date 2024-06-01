@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.31] - 2024-06-01
+### Changed
+- 屏蔽git push的操作
+
 ## [1.0.30] - 2024-06-01
 ### Changed
 - 修订README
@@ -11,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.29] - 2024-06-01
 ### Changed
 - 修订README
+- update changelog
 
 ## [1.0.28] - 2024-06-01
 ### Changed
@@ -183,7 +188,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.29...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.30...HEAD
+[1.0.31]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.30...v1.0.31
 [1.0.30]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.29...v1.0.30
 [1.0.29]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.28...v1.0.29
 [1.0.28]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.27...v1.0.28
