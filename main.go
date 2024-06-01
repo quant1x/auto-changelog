@@ -84,7 +84,8 @@ func main() {
 	slices.SortFunc(allCommits, func(a, b Commit) int {
 		return int(a.Time.UnixMilli() - b.Time.UnixMilli())
 	})
-	lastCommitId := allCommits[len(allCommits)-1].Id
+	lastCommit := allCommits[len(allCommits)-1]
+	lastCommitId := lastCommit.Id
 	//fmt.Printf("lastCommitId: %s\n", lastCommitId)
 	//os.Exit(1)
 	//fmt.Printf("commits： %+v\n", allCommits)
@@ -160,6 +161,26 @@ func main() {
 		fmt.Println("tag无变化")
 		os.Exit(0)
 	}
+	newVersion := incrVersion(latest)
+	tag := fmt.Sprintf("v%s", newVersion)
+	now := time.Now()
+	version := Version{
+		Tag:           tag,
+		Version:       newVersion,
+		Previous:      lastVersion,
+		Date:          now.Format(time.DateOnly),
+		RepositoryURL: repositoryURL,
+		Oldest:        oldest,
+	}
+	version.Time = now
+	version.Commits = Filter(allCommits, func(commit Commit) bool {
+		tm := commit.Time
+		c1 := tm.After(lastTime) && !tm.After(version.Time)
+		//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
+		//return c1 && c2
+		return c1
+	})
+	allVersions = slices.Insert(allVersions, 0, version)
 	//os.Exit(0)
 	tmpl, err := template.New("ChangeLog").Parse(templateChangeLog)
 	if err != nil {
@@ -210,8 +231,7 @@ func main() {
 		fmt.Printf("get HEAD error: %s", err)
 		os.Exit(1)
 	}
-	newVersion := incrVersion(latest)
-	tag := fmt.Sprintf("v%s", newVersion)
+	// 新tag
 	message := fmt.Sprintf("Release version %s", newVersion)
 	_, err = r.CreateTag(tag, h.Hash(), &git.CreateTagOptions{
 		Message: message,
