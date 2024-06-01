@@ -82,6 +82,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	var tags []object.Tag
+	_ = iter.ForEach(func(ref *plumbing.Reference) error {
+		hash := ref.Hash()
+		obj, err := r.TagObject(hash)
+		if err == nil {
+			tags = append(tags, *obj)
+		}
+		return err
+	})
+	slices.SortFunc(tags, func(a, b object.Tag) int {
+		av := fixVersion(a.Name)
+		bv := fixVersion(b.Name)
+		return cmpVersion(av, bv)
+	})
 	allVersions := []Version{}
 
 	oldest := defaultFirstVersion
@@ -89,50 +103,34 @@ func main() {
 	latest := defaultFirstVersion
 	lastVersion := defaultFirstVersion
 	lastTime := time.Unix(0, 0)
+
 	var lastSignature object.Signature
-	if err := iter.ForEach(func(ref *plumbing.Reference) error {
-		hash := ref.Hash()
-		obj, err := r.TagObject(hash)
-		switch err {
-		case nil:
-			// Tag object present
-			fmt.Println("tag hashid:", obj.Target.String())
-			latest = fixVersion(obj.Name)
-			if oldest == defaultFirstVersion {
-				oldest = latest
-			}
-			tagTime := obj.Tagger.When
-			tagDate := tagTime.Format(time.DateOnly)
-			version := Version{
-				Tag:           obj.Name,
-				Version:       latest,
-				Previous:      lastVersion,
-				Date:          tagDate,
-				RepositoryURL: repositoryURL,
-			}
-			c, _ := obj.Commit()
-			version.Time = c.Author.When
-			version.Commits = Filter(allCommits, func(commit Commit) bool {
-				tm := commit.Time
-				return tm.After(lastTime) && !tm.After(version.Time)
-			})
-			lastSignature = obj.Tagger
-			if lastVersion != defaultFirstVersion {
-				allVersions = append(allVersions, version)
-			}
-			lastTime = version.Time
-			lastVersion = latest
-			return nil
-		case plumbing.ErrObjectNotFound:
-			// Not a tag object
-			return nil
-		default:
-			// Some other error
-			return err
+	for _, obj := range tags {
+		latest = fixVersion(obj.Name)
+		if oldest == defaultFirstVersion {
+			oldest = latest
 		}
-	}); err != nil {
-		// Handle outer iterator error
-		panic(err)
+		tagTime := obj.Tagger.When
+		tagDate := tagTime.Format(time.DateOnly)
+		version := Version{
+			Tag:           obj.Name,
+			Version:       latest,
+			Previous:      lastVersion,
+			Date:          tagDate,
+			RepositoryURL: repositoryURL,
+		}
+		c, _ := obj.Commit()
+		version.Time = c.Author.When
+		version.Commits = Filter(allCommits, func(commit Commit) bool {
+			tm := commit.Time
+			return tm.After(lastTime) && !tm.After(version.Time)
+		})
+		lastSignature = obj.Tagger
+		if latest != defaultFirstVersion {
+			allVersions = append(allVersions, version)
+		}
+		lastTime = version.Time
+		lastVersion = latest
 	}
 	slices.SortFunc(allVersions, func(a, b Version) int {
 		return -1 * cmpVersion(a.Version, b.Version)
