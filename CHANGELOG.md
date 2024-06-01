@@ -4,8 +4,14 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.9] - 2024-06-01
+### Changed
+- 释放出更新changelog的commit日志
+- 新增打开本地仓库的错误判断
+
 ## [1.0.8] - 2024-06-01
 ### Changed
+- update changelog
 
 ## [1.0.7] - 2024-06-01
 ### Changed
@@ -80,7 +86,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.8...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.9...HEAD
+[1.0.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.8...v1.0.9
 [1.0.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.7...v1.0.8
 [1.0.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.6...v1.0.7
 [1.0.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.5...v1.0.6
