@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.29] - 2024-06-01
+### Changed
+- 修订README
+
 ## [1.0.28] - 2024-06-01
 ### Changed
 - 调整版本无变化时控制台输出的提示信息
@@ -11,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.27] - 2024-06-01
 ### Changed
 - 修订README-5
+- update changelog
 
 ## [1.0.26] - 2024-06-01
 ### Changed
@@ -173,7 +178,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.27...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.28...HEAD
+[1.0.29]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.28...v1.0.29
 [1.0.28]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.27...v1.0.28
 [1.0.27]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.26...v1.0.27
 [1.0.26]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.25...v1.0.26
