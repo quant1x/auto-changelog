@@ -81,9 +81,10 @@ func main() {
 		allCommits = append(allCommits, commit)
 		return nil
 	})
-	slices.SortFunc(allCommits, func(a, b Commit) int {
-		return int(a.Time.UnixMilli() - b.Time.UnixMilli())
-	})
+	//slices.SortFunc(allCommits, func(a, b Commit) int {
+	//	return int(a.Time.UnixMilli() - b.Time.UnixMilli())
+	//})
+	slices.Reverse(allCommits)
 	lastCommit := allCommits[len(allCommits)-1]
 	lastCommitId := lastCommit.Id
 	//fmt.Printf("lastCommitId: %s\n", lastCommitId)
@@ -158,7 +159,7 @@ func main() {
 	lastTagCommitId := allVersions[0].CommitId
 	//fmt.Println(lastTagCommitId, lastCommitId)
 	if lastTagCommitId == lastCommitId {
-		fmt.Println("tag无变化")
+		fmt.Println("tag no changed")
 		os.Exit(0)
 	}
 	newVersion := incrVersion(latest)
@@ -202,7 +203,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(buf.String())
+	//fmt.Println(buf.String())
 	wt, err := r.Worktree()
 	if err != nil {
 		panic(err)
