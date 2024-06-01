@@ -1,3 +1,6 @@
+# Changelog
+All notable changes to this project will be documented in this file.
+
 {{ if .Versions -}}
 <a name="unreleased"></a>
 ## [Unreleased]
@@ -12,12 +15,11 @@
 {{ end -}}
 
 {{ range .Versions }}
-<a name="{{ .Tag.Name }}"></a>
-## {{ if .Tag.Previous }}[{{ .Tag.Name }}]{{ else }}{{ .Tag.Name }}{{ end }} - {{ datetime "2006-01-02" .Tag.Date }}
-{{ range .CommitGroups -}}
+<a name="{{ replace .Tag.Name "v"  "" 1 }}"></a>
+## {{ if .Tag.Previous }}[{{ replace .Tag.Name "v" "" 1 }}]{{ else }}{{ replace .Tag.Name "v" "" 1 }}{{ end }} - {{ datetime "2006-01-02" .Tag.Date }}
+### Changed
 {{ range .Commits -}}
-- {{ .Header }}
-{{ end }}
+- {{ .Subject }}
 {{ end -}}
 
 {{- if .RevertCommits -}}
@@ -41,7 +43,7 @@
 [Unreleased]: {{ .Info.RepositoryURL }}/compare/{{ $latest := index .Versions 0 }}{{ $latest.Tag.Name }}...HEAD
 {{ range .Versions -}}
 {{ if .Tag.Previous -}}
-[{{ .Tag.Name }}]: {{ $.Info.RepositoryURL }}/compare/{{ .Tag.Previous.Name }}...{{ .Tag.Name }}
+[{{ replace .Tag.Name "v" "" 1 }}]: {{ $.Info.RepositoryURL }}/compare/{{ .Tag.Previous.Name }}...{{ .Tag.Name }}
 {{ end -}}
 {{ end -}}
 {{ end -}}
