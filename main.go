@@ -154,6 +154,7 @@ func main() {
 		//RepositoryURL: repositoryURL,
 		Oldest: oldest,
 	}
+	latest = newVersion
 	version.Time = now
 	version.Commits = Filter(allCommits, func(commit Commit) bool {
 		tm := commit.Time
