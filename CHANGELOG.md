@@ -2,7 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-
+## [1.0.36] - 2024-06-02
+### Changed
+- 修订模板
 
 ## [1.0.35] - 2024-06-02
 ### Changed
@@ -12,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.34] - 2024-06-02
 ### Changed
 - 去掉冗余的资源url变量字段
+- update changelog
 
 ## [1.0.33] - 2024-06-02
 ### Changed
@@ -209,7 +212,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.34...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.35...HEAD
+[1.0.36]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.35...v1.0.36
 [1.0.35]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.34...v1.0.35
 [1.0.34]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.33...v1.0.34
 [1.0.33]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.32...v1.0.33
