@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 
+## [1.0.35] - 2024-06-02
+### Changed
+- 删除冗余的资源url变量字段
+- 增加控制台输出新tag的信息
+
 ## [1.0.34] - 2024-06-02
 ### Changed
 - 去掉冗余的资源url变量字段
@@ -11,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.33] - 2024-06-02
 ### Changed
 - 拆分模板常量
+- update changelog
 
 ## [1.0.32] - 2024-06-01
 ### Changed
@@ -203,7 +209,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.33...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.34...HEAD
+[1.0.35]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.34...v1.0.35
 [1.0.34]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.33...v1.0.34
 [1.0.33]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.32...v1.0.33
 [1.0.32]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.31...v1.0.32
