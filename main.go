@@ -221,6 +221,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 	} else {
+		fmt.Printf("new tag, %s\n", message)
 		fmt.Println("Auto ChangeLog, OK.")
 	}
 }
