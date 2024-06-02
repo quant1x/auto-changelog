@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.39] - 2024-06-14
+### Changed
+- 允许传入参数,指定主版本,次版本及修订版本号加1, 默认是修订版本号
+
 ## [1.0.38] - 2024-06-02
 ### Changed
 - 修订latest最新版本跟随新tag
@@ -10,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ## [1.0.37] - 2024-06-02
 ### Changed
 - 修订模板
+- update changelog
 
 ## [1.0.36] - 2024-06-02
 ### Changed
@@ -223,7 +228,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.38...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.39...HEAD
+[1.0.39]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.38...v1.0.39
 [1.0.38]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.37...v1.0.38
 [1.0.37]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.36...v1.0.37
 [1.0.36]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.35...v1.0.36
