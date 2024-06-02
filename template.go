@@ -5,8 +5,7 @@ const (
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-
-{{- range .Versions}}
+{{ range .Versions}}
 ## [{{.Version}}] - {{.Date}}
 ### Changed
 {{- range .Commits}}
