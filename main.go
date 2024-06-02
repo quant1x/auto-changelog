@@ -106,12 +106,12 @@ func main() {
 		tagTime := obj.Tagger.When
 		tagDate := tagTime.Format(time.DateOnly)
 		version := Version{
-			Tag:           obj.Name,
-			Version:       latest,
-			Previous:      lastVersion,
-			Date:          tagDate,
-			RepositoryURL: repositoryURL,
-			Oldest:        oldest,
+			Tag:      obj.Name,
+			Version:  latest,
+			Previous: lastVersion,
+			Date:     tagDate,
+			//RepositoryURL: repositoryURL,
+			Oldest: oldest,
 		}
 		c, _ := obj.Commit()
 		//version.Time = c.Committer.When
@@ -147,12 +147,12 @@ func main() {
 	tag := fmt.Sprintf("v%s", newVersion)
 	now := time.Now()
 	version := Version{
-		Tag:           tag,
-		Version:       newVersion,
-		Previous:      lastVersion,
-		Date:          now.Format(time.DateOnly),
-		RepositoryURL: repositoryURL,
-		Oldest:        oldest,
+		Tag:      tag,
+		Version:  newVersion,
+		Previous: lastVersion,
+		Date:     now.Format(time.DateOnly),
+		//RepositoryURL: repositoryURL,
+		Oldest: oldest,
 	}
 	version.Time = now
 	version.Commits = Filter(allCommits, func(commit Commit) bool {

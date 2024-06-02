@@ -7,17 +7,17 @@ import (
 )
 
 type Version struct {
-	Tag           string
-	Version       string
-	Author        string
-	Date          string
-	Time          time.Time
-	Message       string
-	Previous      string
-	RepositoryURL string
-	Oldest        string
-	CommitId      string
-	Commits       []Commit
+	Tag      string
+	Version  string
+	Author   string
+	Date     string
+	Time     time.Time
+	Message  string
+	Previous string
+	//RepositoryURL string
+	Oldest   string
+	CommitId string
+	Commits  []Commit
 }
 
 type Commit struct {
