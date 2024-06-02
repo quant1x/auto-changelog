@@ -14,7 +14,6 @@ type Version struct {
 	Time     time.Time
 	Message  string
 	Previous string
-	//RepositoryURL string
 	Oldest   string
 	CommitId string
 	Commits  []Commit
