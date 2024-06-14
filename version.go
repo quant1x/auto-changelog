@@ -60,10 +60,30 @@ func cmpVersion(a, b string) int {
 	return 0
 }
 
-func incrVersion(v string) string {
+//major version（主版本号）必须被递增，次版本号和修订版本号必须被设置为零。
+//
+//在进行向后兼容的更改（例如，增加了一个新的功能）之后，minor version（次版本号
+
+type VersionKind int
+
+const (
+	MajorVersion VersionKind = iota // 主版本
+	MinorVersion                    // 次版本
+	PatchVersion                    // 默认修订版本
+)
+
+// 版本号自动加1
+func incrVersion(v string, kind VersionKind) string {
 	vs := parseVersion(v)
-	pos := len(vs) - 1
+	length := len(vs)
+	if length != 3 {
+		panic("invalid version")
+	}
+	pos := int(kind)
 	patchVersion := vs[pos] + 1
+	for i := pos + 1; i < length; i++ {
+		vs[i] = 0
+	}
 	vs[pos] = patchVersion
 	version := ""
 	for _, v := range vs {

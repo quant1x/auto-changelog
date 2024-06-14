@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -20,6 +21,19 @@ const (
 )
 
 func main() {
+	flag.Parse()
+	verKind := PatchVersion
+	if flag.NArg() > 0 {
+		kind := strings.ToLower(flag.Arg(0))
+		switch kind {
+		case "major", "0":
+			verKind = MajorVersion
+		case "minor", "1":
+			verKind = MinorVersion
+		default:
+			verKind = PatchVersion
+		}
+	}
 	currentPath, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -143,7 +157,7 @@ func main() {
 		fmt.Println("tag no changed")
 		os.Exit(0)
 	}
-	newVersion := incrVersion(latest)
+	newVersion := incrVersion(latest, verKind)
 	tag := fmt.Sprintf("v%s", newVersion)
 	now := time.Now()
 	version := Version{
