@@ -60,10 +60,7 @@ func cmpVersion(a, b string) int {
 	return 0
 }
 
-//major version（主版本号）必须被递增，次版本号和修订版本号必须被设置为零。
-//
-//在进行向后兼容的更改（例如，增加了一个新的功能）之后，minor version（次版本号
-
+// VersionKind 版本号类型
 type VersionKind int
 
 const (
