@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.2] - 2024-06-17
+### Changed
+- 修订README, 输出两种ChangeLog工具的用法
+
 ## [1.1.1] - 2024-06-14
 ### Changed
 - 增加usage
@@ -11,6 +15,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.0] - 2024-06-14
 ### Changed
 - 版本号类型增加注释, 测试次版本号+1
+- update changelog
 
 ## [1.0.39] - 2024-06-14
 ### Changed
@@ -239,7 +244,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.1...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.2...HEAD
+[1.1.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.1...v1.1.2
 [1.1.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.0...v1.1.1
 [1.1.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.39...v1.1.0
 [1.0.39]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.38...v1.0.39
