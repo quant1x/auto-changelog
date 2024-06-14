@@ -22,11 +22,11 @@ const (
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Usage: %s [OPTIONS]\n\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "OPTIONS:\n")
-		fmt.Fprintf(os.Stderr, "\t major|0 主版本号+1\n")
-		fmt.Fprintf(os.Stderr, "\t minor|1 次版本号+1\n")
-		fmt.Fprintf(os.Stderr, "\t 默认修订版本号+1\n")
+		fmt.Printf("Usage: %s [OPTIONS]\n\n", os.Args[0])
+		fmt.Printf("OPTIONS:\n")
+		fmt.Printf("\t major|0 主版本号+1\n")
+		fmt.Printf("\t minor|1 次版本号+1\n")
+		fmt.Printf("\t 默认修订版本号+1\n")
 	}
 	flag.Parse()
 	verKind := PatchVersion
@@ -37,6 +37,8 @@ func main() {
 			verKind = MajorVersion
 		case "minor", "1":
 			verKind = MinorVersion
+		case "patch", "2":
+			verKind = PatchVersion
 		default:
 			verKind = PatchVersion
 		}
