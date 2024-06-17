@@ -1,9 +1,18 @@
 AutoChangeLog
 ===
 # 1. shell实现的changelog
+### 1.1 首次使用change, 需要初始化CHANGELOG.md
 ```shell
 change init
+```
+
+### 1.2 提取新增的tag, 添加commit信息到CHANGELOG.md
+```shell
 change
+```
+
+### 1.3 重置tag, 以保持当前代码commit id为最新的tag
+```shell
 change tag
 ```
 
