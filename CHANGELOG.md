@@ -3,9 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.6] - 2024-06-20
+### Changed
+- add LICENSE.
+
+Signed-off-by: 王布衣 <wangfengxy@sina.cn>
+
 ## [1.1.5] - 2024-06-20
 ### Changed
 - 修复自动更新ChangeLog的commit信息时间非最新时间的bug
+- update changelog
 
 ## [1.1.4] - 2024-06-17
 ### Changed
@@ -259,7 +266,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.5...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.6...HEAD
+[1.1.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.5...v1.1.6
 [1.1.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.4...v1.1.5
 [1.1.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.3...v1.1.4
 [1.1.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.2...v1.1.3
