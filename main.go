@@ -222,6 +222,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	lastSignature.When = time.Now()
 	commit, err := wt.Commit(commitUpdateChangeLog, &git.CommitOptions{
 		Author: &lastSignature,
 	})
