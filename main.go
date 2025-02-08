@@ -75,10 +75,11 @@ func main() {
 	err = cIter.ForEach(func(c *object.Commit) error {
 		hash := c.ID()
 		commit := Commit{
-			Id:      hash.String(),
-			Author:  c.Committer.Name,
-			Time:    c.Committer.When,
-			Message: strings.TrimSpace(c.Message),
+			Id:        hash.String(),
+			Author:    c.Committer.Name,
+			Time:      c.Committer.When,
+			Message:   strings.TrimSpace(c.Message),
+			Signature: c.Author, // for commit message
 		}
 		//fmt.Println(commit)
 		allCommits = append(allCommits, commit)
@@ -111,7 +112,7 @@ func main() {
 		bv := fixVersion(b.Name)
 		return cmpVersion(av, bv)
 	})
-	var allVersions []Version
+	var allVersions []TagCommits
 
 	oldest := defaultFirstVersion
 	//current := defaultFirstVersion
@@ -127,7 +128,7 @@ func main() {
 		}
 		tagTime := obj.Tagger.When
 		tagDate := tagTime.Format(time.DateOnly)
-		version := Version{
+		version := TagCommits{
 			Tag:      obj.Name,
 			Version:  latest,
 			Previous: lastVersion,
@@ -146,16 +147,17 @@ func main() {
 			c1 := tm.After(lastTime) && !tm.After(version.Time)
 			//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
 			//return c1 && c2
+			lastSignature = commit.Signature
 			return c1
 		})
-		lastSignature = obj.Tagger
+		//lastSignature = obj.Tagger
 		if latest != defaultFirstVersion /*&& latest != oldest*/ {
 			allVersions = append(allVersions, version)
 		}
 		lastTime = version.Time
 		lastVersion = latest
 	}
-	slices.SortFunc(allVersions, func(a, b Version) int {
+	slices.SortFunc(allVersions, func(a, b TagCommits) int {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
 	//fmt.Printf("%+v\n", allVersions)
@@ -168,7 +170,7 @@ func main() {
 	newVersion := incrVersion(latest, verKind)
 	tag := fmt.Sprintf("v%s", newVersion)
 	now := time.Now()
-	version := Version{
+	version := TagCommits{
 		Tag:      tag,
 		Version:  newVersion,
 		Previous: lastVersion,
@@ -187,13 +189,14 @@ func main() {
 	})
 	allVersions = slices.Insert(allVersions, 0, version)
 	//os.Exit(0)
+	// 更新ChangeLog
 	tmpl, err := template.New("ChangeLog").Parse(templateChangeLog)
 	if err != nil {
 		panic(err)
 	}
 	data := struct {
 		RepositoryURL string
-		Versions      []Version
+		Versions      []TagCommits
 		Latest        string
 		Oldest        string
 	}{
@@ -223,7 +226,8 @@ func main() {
 	}
 	lastSignature.When = time.Now()
 	commit, err := wt.Commit(commitUpdateChangeLog, &git.CommitOptions{
-		Author: &lastSignature,
+		Author:    &lastSignature,
+		Committer: &lastSignature,
 	})
 	obj, err := r.CommitObject(commit)
 	if err != nil {
