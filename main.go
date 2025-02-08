@@ -71,7 +71,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	allCommits := []Commit{}
+	var allCommits []Commit
 	// 打印所有提交信息
 	err = cIter.ForEach(func(c *object.Commit) error {
 		hash := c.ID()
@@ -112,7 +112,7 @@ func main() {
 		bv := fixVersion(b.Name)
 		return cmpVersion(av, bv)
 	})
-	allVersions := []Version{}
+	var allVersions []Version
 
 	oldest := defaultFirstVersion
 	//current := defaultFirstVersion
