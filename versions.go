@@ -1,12 +1,13 @@
 package main
 
 import (
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"strconv"
 	"strings"
 	"time"
 )
 
-type Version struct {
+type TagCommits struct {
 	Tag      string
 	Version  string
 	Author   string
@@ -20,10 +21,11 @@ type Version struct {
 }
 
 type Commit struct {
-	Id      string
-	Author  string
-	Time    time.Time
-	Message string
+	Id        string
+	Author    string
+	Time      time.Time
+	Message   string
+	Signature object.Signature
 }
 
 func fixVersion(tag string) string {
