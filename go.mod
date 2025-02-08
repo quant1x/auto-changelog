@@ -1,6 +1,6 @@
 module gitee.com/quant1x/autochangelog
 
-go 1.21.12
+go 1.21.13
 
 require github.com/go-git/go-git/v5 v5.13.2
 
