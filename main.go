@@ -30,7 +30,8 @@ func main() {
 	}
 	flag.Parse()
 	verKind := PatchVersion
-	if flag.NArg() > 0 {
+	argc := flag.NArg()
+	if argc > 0 {
 		kind := strings.ToLower(flag.Arg(0))
 		switch kind {
 		case "major", "0":
