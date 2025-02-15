@@ -47,8 +47,9 @@ func main() {
 			verKind = PatchVersion
 		}
 	}
-	fmt.Printf("argc: %d, %s\n", argc, versionFlag)
-	os.Exit(0)
+	//fmt.Printf("argc: %d, %s\n", argc, versionFlag)
+	//os.Exit(0)
+	_ = versionFlag
 	currentPath, err := os.Getwd()
 	if err != nil {
 		panic(err)
