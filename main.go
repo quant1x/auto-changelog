@@ -31,8 +31,11 @@ func main() {
 	flag.Parse()
 	verKind := PatchVersion
 	argc := flag.NArg()
+	versionFlag := "patch"
 	if argc > 0 {
-		kind := strings.ToLower(flag.Arg(0))
+		arg := strings.TrimSpace(flag.Arg(0))
+		kind := strings.ToLower(arg)
+		versionFlag = kind
 		switch kind {
 		case "major", "0":
 			verKind = MajorVersion
@@ -44,6 +47,8 @@ func main() {
 			verKind = PatchVersion
 		}
 	}
+	fmt.Printf("argc: %d, %s\n", argc, versionFlag)
+	os.Exit(0)
 	currentPath, err := os.Getwd()
 	if err != nil {
 		panic(err)
