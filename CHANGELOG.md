@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 - 实验push代码
 - update changelog
 - update changelog
+- update changelog
+- 屏蔽实验性质的push代码, 更新依赖库版本
 
 ## [1.1.16] - 2025-05-05
 ### Changed
