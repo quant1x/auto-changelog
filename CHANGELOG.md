@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - 实验push代码
 - update changelog
+- update changelog
 
 ## [1.1.16] - 2025-05-05
 ### Changed
