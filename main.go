@@ -241,12 +241,10 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("%+v\n", obj)
-	err = r.Push(&git.PushOptions{})
-	if err != nil {
-		panic(err)
-	}
 	//err = r.Push(&git.PushOptions{})
-	//fmt.Printf("%+v\n", err)
+	//if err != nil {
+	//	panic(err)
+	//}
 	h, err := r.Head()
 	if err != nil {
 		fmt.Printf("get HEAD error: %s", err)
