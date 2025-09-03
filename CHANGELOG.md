@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.18] - 2025-09-03
+### Changed
+- 更新go最低版本到1.25
+
 ## [1.1.17] - 2025-05-05
 ### Changed
 - 实验push代码
@@ -10,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - update changelog
 - update changelog
 - 屏蔽实验性质的push代码, 更新依赖库版本
+- update changelog
 
 ## [1.1.16] - 2025-05-05
 ### Changed
@@ -326,7 +331,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.17...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.18...HEAD
+[1.1.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.17...v1.1.18
 [1.1.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.16...v1.1.17
 [1.1.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.15...v1.1.16
 [1.1.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.14...v1.1.15
