@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.1] - 2025-09-13
+### Changed
+- 初始化的项目可以继续后面的tag流程
+
 ## [1.2.0] - 2025-09-03
 ### Changed
 - 更新依赖库版本
+- update changelog
 
 ## [1.1.18] - 2025-09-03
 ### Changed
@@ -336,7 +341,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.0...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.1...HEAD
+[1.2.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.0...v1.2.1
 [1.2.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.18...v1.2.0
 [1.1.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.17...v1.1.18
 [1.1.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.16...v1.1.17
