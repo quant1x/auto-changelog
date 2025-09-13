@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"os"
 	"slices"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 const (
@@ -167,12 +168,12 @@ func main() {
 	slices.SortFunc(allVersions, func(a, b TagCommits) int {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
-	//fmt.Printf("%+v\n", allVersions)
-	lastTagCommitId := allVersions[0].CommitId
-	//fmt.Println(lastTagCommitId, lastCommitId)
-	if lastTagCommitId == lastCommitId {
-		fmt.Println("tag no changed")
-		os.Exit(0)
+	if len(allVersions) > 0 {
+		lastTagCommitId := allVersions[0].CommitId
+		if lastTagCommitId == lastCommitId {
+			fmt.Println("tag no changed")
+			os.Exit(0)
+		}
 	}
 	newVersion := incrVersion(latest, verKind)
 	tag := fmt.Sprintf("v%s", newVersion)
