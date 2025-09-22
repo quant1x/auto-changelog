@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.2] - 2025-09-23
+### Changed
+- 新增控制台参数，默认patch版本号+1
+
 ## [1.2.1] - 2025-09-13
 ### Changed
 - 初始化的项目可以继续后面的tag流程
+- update changelog
 
 ## [1.2.0] - 2025-09-03
 ### Changed
@@ -341,7 +346,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.1...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.2...HEAD
+[1.2.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.1...v1.2.2
 [1.2.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.0...v1.2.1
 [1.2.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.18...v1.2.0
 [1.1.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.17...v1.1.18
