@@ -22,35 +22,31 @@ const (
 )
 
 func main() {
+	var (
+		majorFlag = flag.Bool("major", false, "主版本号+1")
+		minorFlag = flag.Bool("minor", false, "次版本号+1")
+		patchFlag = flag.Bool("patch", false, "修订版本号+1 (默认)")
+	)
 	flag.Usage = func() {
-		fmt.Printf("Usage: %s [OPTIONS]\n\n", os.Args[0])
-		fmt.Printf("OPTIONS:\n")
-		fmt.Printf("\t major|0 主版本号+1\n")
-		fmt.Printf("\t minor|1 次版本号+1\n")
-		fmt.Printf("\t 默认修订版本号+1\n")
+		exeName := os.Args[0]
+		if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
+			exeName = exeName[idx+1:]
+		}
+		fmt.Printf("Usage: %s [--major] [--minor] [--patch]\n", exeName)
+		fmt.Printf("  --major   主版本号+1\n")
+		fmt.Printf("  --minor   次版本号+1\n")
+		fmt.Printf("  --patch   修订版本号+1 (默认)\n")
 	}
 	flag.Parse()
 	verKind := PatchVersion
-	argc := flag.NArg()
-	versionFlag := "patch"
-	if argc > 0 {
-		arg := strings.TrimSpace(flag.Arg(0))
-		kind := strings.ToLower(arg)
-		versionFlag = kind
-		switch kind {
-		case "major", "0":
-			verKind = MajorVersion
-		case "minor", "1":
-			verKind = MinorVersion
-		case "patch", "2":
-			verKind = PatchVersion
-		default:
-			verKind = PatchVersion
-		}
+	if *majorFlag {
+		verKind = MajorVersion
+	} else if *minorFlag {
+		verKind = MinorVersion
+	} else if *patchFlag {
+		verKind = PatchVersion
 	}
-	//fmt.Printf("argc: %d, %s\n", argc, versionFlag)
-	//os.Exit(0)
-	_ = versionFlag
+	// 如果没有任何参数，默认 patch
 	currentPath, err := os.Getwd()
 	if err != nil {
 		panic(err)
