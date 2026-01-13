@@ -36,10 +36,19 @@ func fixVersion(tag string) string {
 // parseVersion 将版本号字符串转换为int切片
 func parseVersion(v string) []int {
 	parts := strings.Split(v, ".")
-	version := make([]int, len(parts))
-	for i, p := range parts {
-		num, _ := strconv.Atoi(p) // 忽略错误，假设输入总是有效的
-		version[i] = num
+	// Parse parts, treating non-integer or empty parts as 0
+	version := make([]int, 0, len(parts))
+	for _, p := range parts {
+		if p == "" {
+			version = append(version, 0)
+			continue
+		}
+		num, err := strconv.Atoi(p)
+		if err != nil {
+			version = append(version, 0)
+			continue
+		}
+		version = append(version, num)
 	}
 	return version
 }
@@ -47,17 +56,25 @@ func parseVersion(v string) []int {
 func cmpVersion(a, b string) int {
 	v1 := parseVersion(a)
 	v2 := parseVersion(b)
-	for i := 0; i < len(v1) && i < len(v2); i++ {
-		if v1[i] < v2[i] {
+	// compare up to the longer length, treat missing parts as 0
+	maxLen := len(v1)
+	if len(v2) > maxLen {
+		maxLen = len(v2)
+	}
+	for i := 0; i < maxLen; i++ {
+		var n1, n2 int
+		if i < len(v1) {
+			n1 = v1[i]
+		}
+		if i < len(v2) {
+			n2 = v2[i]
+		}
+		if n1 < n2 {
 			return -1
 		}
-		if v1[i] > v2[i] {
+		if n1 > n2 {
 			return 1
 		}
-	}
-	// 如果一个版本号比另一个短，并且前面的部分都相等，那么较短的版本号更小
-	if len(v1) < len(v2) {
-		return -1
 	}
 	return 0
 }
@@ -74,19 +91,23 @@ const (
 // 版本号自动加1
 func incrVersion(v string, kind VersionKind) string {
 	vs := parseVersion(v)
-	length := len(vs)
-	if length != 3 {
-		panic("invalid version")
+	// Ensure at least 3 parts
+	for len(vs) < 3 {
+		vs = append(vs, 0)
 	}
 	pos := int(kind)
-	patchVersion := vs[pos] + 1
-	for i := pos + 1; i < length; i++ {
+	if pos < 0 || pos >= len(vs) {
+		panic("invalid version kind")
+	}
+	vs[pos] = vs[pos] + 1
+	// zero out lower-order parts
+	for i := pos + 1; i < len(vs); i++ {
 		vs[i] = 0
 	}
-	vs[pos] = patchVersion
-	version := ""
-	for _, v := range vs {
-		version += "." + strconv.Itoa(v)
+	// build version string
+	parts := make([]string, len(vs))
+	for i, n := range vs {
+		parts[i] = strconv.Itoa(n)
 	}
-	return version[1:]
+	return strings.Join(parts, ".")
 }

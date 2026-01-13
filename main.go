@@ -61,6 +61,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	if len(remotes) == 0 {
+		fmt.Fprintln(os.Stderr, "no remotes found in repository")
+		os.Exit(1)
+	}
 	remote := remotes[0]
 	cfg := remote.Config()
 	//fmt.Printf("%+v\n", cfg)
@@ -89,6 +93,10 @@ func main() {
 		allCommits = append(allCommits, commit)
 		return nil
 	})
+	if len(allCommits) == 0 {
+		fmt.Fprintln(os.Stderr, "no commits found in repository; cannot create changelog")
+		os.Exit(1)
+	}
 	//slices.SortFunc(allCommits, func(a, b Commit) int {
 	//	return int(a.Time.UnixMilli() - b.Time.UnixMilli())
 	//})
@@ -102,16 +110,30 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	var tags []object.Tag
+	type TagInfo struct {
+		Name   string
+		Time   time.Time
+		Commit *object.Commit
+	}
+	var tags []TagInfo
 	_ = iter.ForEach(func(ref *plumbing.Reference) error {
 		hash := ref.Hash()
+		// try annotated tag first
 		obj, err := r.TagObject(hash)
 		if err == nil {
-			tags = append(tags, *obj)
+			c, _ := obj.Commit()
+			tags = append(tags, TagInfo{Name: ref.Name().Short(), Time: obj.Tagger.When, Commit: c})
+			return nil
 		}
-		return err
+		// fallback to lightweight tag (points directly to a commit)
+		c, cerr := r.CommitObject(hash)
+		if cerr == nil {
+			tags = append(tags, TagInfo{Name: ref.Name().Short(), Time: c.Committer.When, Commit: c})
+			return nil
+		}
+		return nil
 	})
-	slices.SortFunc(tags, func(a, b object.Tag) int {
+	slices.SortFunc(tags, func(a, b TagInfo) int {
 		av := fixVersion(a.Name)
 		bv := fixVersion(b.Name)
 		return cmpVersion(av, bv)
@@ -130,7 +152,7 @@ func main() {
 		if oldest == defaultFirstVersion {
 			oldest = latest
 		}
-		tagTime := obj.Tagger.When
+		tagTime := obj.Time
 		tagDate := tagTime.Format(time.DateOnly)
 		version := TagCommits{
 			Tag:      obj.Name,
@@ -140,22 +162,20 @@ func main() {
 			//RepositoryURL: repositoryURL,
 			Oldest: oldest,
 		}
-		c, _ := obj.Commit()
-		//version.Time = c.Committer.When
+		// commit object for this tag
+		c := obj.Commit
 		version.Time = tagTime
-		version.CommitId = c.ID().String()
-		//fmt.Println(c.Hash, c.ID(), c.ParentHashes)
-		//fmt.Println(lastTime, version.Time)
+		if c != nil {
+			version.CommitId = c.ID().String()
+		}
 		version.Commits = Filter(allCommits, func(commit Commit) bool {
 			tm := commit.Time
 			c1 := tm.After(lastTime) && !tm.After(version.Time)
-			//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
-			//return c1 && c2
+			// capture last signature of commits in range
 			lastSignature = commit.Signature
 			return c1
 		})
-		//lastSignature = obj.Tagger
-		if latest != defaultFirstVersion /*&& latest != oldest*/ {
+		if latest != defaultFirstVersion {
 			allVersions = append(allVersions, version)
 		}
 		lastTime = version.Time
@@ -244,6 +264,9 @@ func main() {
 		Author:    &lastSignature,
 		Committer: &lastSignature,
 	})
+	if err != nil {
+		panic(err)
+	}
 	obj, err := r.CommitObject(commit)
 	if err != nil {
 		panic(err)
