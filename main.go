@@ -228,6 +228,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	// Ensure we have a valid signature (fallback to last commit's author when no annotated tags exist)
+	if lastSignature.Name == "" && lastSignature.Email == "" {
+		if len(allCommits) > 0 {
+			// use the latest commit's signature as the author/committer
+			lastSignature = allCommits[len(allCommits)-1].Signature
+		} else {
+			// No commits in repository — this tool requires at least one commit
+			fmt.Fprintln(os.Stderr, "no commits found in repository; cannot create changelog")
+			os.Exit(1)
+		}
+	}
 	lastSignature.When = time.Now()
 	commit, err := wt.Commit(commitUpdateChangeLog, &git.CommitOptions{
 		Author:    &lastSignature,
