@@ -3,9 +3,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-14
+### Changed
+- chore: changelog commit message now includes version number
+- 更新依赖库版本
+
+## [1.2.5] - 2026-01-13
+### Changed
+
+## [1.2.4] - 2026-01-13
+### Changed
+
 ## [1.2.3] - 2025-09-23
 ### Changed
 - 重新梳理文档
+- update changelog
 
 ## [1.2.2] - 2025-09-23
 ### Changed
@@ -351,7 +363,10 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.3...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.0...HEAD
+[1.3.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.5...v1.3.0
+[1.2.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.4...v1.2.5
+[1.2.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.3...v1.2.4
 [1.2.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.2...v1.2.3
 [1.2.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.1...v1.2.2
 [1.2.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.0...v1.2.1
