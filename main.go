@@ -16,9 +16,8 @@ import (
 )
 
 const (
-	changeLogFilename     = "CHANGELOG.md"
-	commitUpdateChangeLog = "update changelog"
-	defaultFirstVersion   = "0.0.0"
+	changeLogFilename   = "CHANGELOG.md"
+	defaultFirstVersion = "0.0.0"
 )
 
 func main() {
@@ -260,7 +259,7 @@ func main() {
 		}
 	}
 	lastSignature.When = time.Now()
-	commit, err := wt.Commit(commitUpdateChangeLog, &git.CommitOptions{
+	commit, err := wt.Commit(fmt.Sprintf("release v%s", newVersion), &git.CommitOptions{
 		Author:    &lastSignature,
 		Committer: &lastSignature,
 	})
