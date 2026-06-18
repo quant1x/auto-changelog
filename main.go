@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -23,44 +22,62 @@ const (
 	defaultFirstVersion = "0.0.0"
 )
 
-// updateCargoVersion updates the version field in Cargo.toml under [package].
-// Returns true if the file was modified.
+// 预编译正则，避免每次调用都编译
+var (
+	// 匹配 [package] 或 [workspace.package] 块
+	sectionRe = regexp.MustCompile(`(?m)^\s*\[(workspace\.)?package\]\s*$`)
+	// 匹配 version = "x.y.z"
+	versionRe = regexp.MustCompile(`(?m)^(\s*version\s*=\s*)".*"\s*$`)
+)
+
 func updateCargoVersion(filePath, newVersion string) (bool, error) {
-	f, err := os.Open(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return false, err
 	}
-	defer f.Close()
 
-	var lines []string
-	inPackage := false
-	versionRe := regexp.MustCompile(`^\s*version\s*=\s*".*"\s*$`)
+	// 1. 检测原始文件的换行符，防止跨平台换行符被篡改
+	eol := "\n"
+	if bytes.Contains(content, []byte("\r\n")) {
+		eol = "\r\n"
+	}
+
+	// 2. 按行分割，保留空行
+	lines := bytes.Split(content, []byte(eol))
+
+	inTargetSection := false
 	updated := false
 
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "[package]" {
-			inPackage = true
-		} else if strings.HasPrefix(trimmed, "[") && inPackage {
-			// entering a different section, leave [package]
-			inPackage = false
+	for i, line := range lines {
+		trimmed := bytes.TrimSpace(line)
+
+		// 判断是否进入目标 section
+		if sectionRe.Match(trimmed) {
+			inTargetSection = true
+			continue
 		}
-		if inPackage && versionRe.MatchString(line) {
-			line = fmt.Sprintf(`version = "%s"`, newVersion)
+
+		// 判断是否进入其他 section (离开目标 section)
+		if bytes.HasPrefix(trimmed, []byte("[")) && inTargetSection {
+			inTargetSection = false
+		}
+
+		// 如果在目标 section 内，且匹配到 version，则替换
+		if inTargetSection && versionRe.Match(line) {
+			// 使用正则替换，保留前面的空格和等号
+			newLine := versionRe.ReplaceAll(line, []byte(fmt.Sprintf(`${1}"%s"`, newVersion)))
+			lines[i] = newLine
 			updated = true
 		}
-		lines = append(lines, line)
 	}
-	if err := scanner.Err(); err != nil {
-		return false, err
-	}
+
 	if !updated {
 		return false, nil
 	}
-	// write back
-	return true, os.WriteFile(filePath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
+
+	// 3. 使用原始换行符重新拼接
+	newContent := bytes.Join(lines, []byte(eol))
+	return true, os.WriteFile(filePath, newContent, 0644)
 }
 
 func main() {
