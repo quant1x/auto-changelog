@@ -3,11 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.2] - 2026-06-18
+### Changed
+- feat: sync Cargo.toml version when updating changelog
+
 ## [1.3.1] - 2026-06-14
 ### Changed
 - chore: changelog commit message now includes version number
 - 更新依赖库版本
 - 暂时删除CHANGELOG
+- release v1.3.1
 
 ## [1.3.0] - 2026-06-14
 ### Changed
@@ -374,7 +379,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.1...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.2...HEAD
+[1.3.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.1...v1.3.2
 [1.3.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.0...v1.3.1
 [1.3.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.5...v1.3.0
 [1.2.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.4...v1.2.5
