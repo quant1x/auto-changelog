@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 	"text/template"
@@ -17,8 +19,49 @@ import (
 
 const (
 	changeLogFilename   = "CHANGELOG.md"
+	cargoTomlFilename   = "Cargo.toml"
 	defaultFirstVersion = "0.0.0"
 )
+
+// updateCargoVersion updates the version field in Cargo.toml under [package].
+// Returns true if the file was modified.
+func updateCargoVersion(filePath, newVersion string) (bool, error) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	var lines []string
+	inPackage := false
+	versionRe := regexp.MustCompile(`^\s*version\s*=\s*".*"\s*$`)
+	updated := false
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "[package]" {
+			inPackage = true
+		} else if strings.HasPrefix(trimmed, "[") && inPackage {
+			// entering a different section, leave [package]
+			inPackage = false
+		}
+		if inPackage && versionRe.MatchString(line) {
+			line = fmt.Sprintf(`version = "%s"`, newVersion)
+			updated = true
+		}
+		lines = append(lines, line)
+	}
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+	if !updated {
+		return false, nil
+	}
+	// write back
+	return true, os.WriteFile(filePath, []byte(strings.Join(lines, "\n")+"\n"), 0644)
+}
 
 func main() {
 	var (
@@ -246,6 +289,13 @@ func main() {
 	_, err = wt.Add(filename)
 	if err != nil {
 		panic(err)
+	}
+	// 同步更新 Cargo.toml 中的版本号
+	if modified, uerr := updateCargoVersion(cargoTomlFilename, newVersion); uerr == nil && modified {
+		if _, err = wt.Add(cargoTomlFilename); err != nil {
+			panic(err)
+		}
+		fmt.Printf("updated %s version to %s\n", cargoTomlFilename, newVersion)
 	}
 	// Ensure we have a valid signature (fallback to last commit's author when no annotated tags exist)
 	if lastSignature.Name == "" && lastSignature.Email == "" {
