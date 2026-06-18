@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.6] - 2026-06-18
+### Changed
+- refactor: replace panic with fatal for better UX
+
 ## [1.3.5] - 2026-06-18
 ### Changed
 - refactor: use cargo check instead of cargo generate-lockfile
+- release v1.3.5
 
 ## [1.3.4] - 2026-06-18
 ### Changed
@@ -394,7 +399,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.5...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.6...HEAD
+[1.3.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.5...v1.3.6
 [1.3.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.4...v1.3.5
 [1.3.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.3...v1.3.4
 [1.3.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.2...v1.3.3
