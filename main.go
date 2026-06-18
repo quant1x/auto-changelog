@@ -81,6 +81,11 @@ func updateCargoVersion(filePath, newVersion string) (bool, error) {
 	return true, os.WriteFile(filePath, newContent, 0644)
 }
 
+func fatal(err error) {
+	fmt.Fprintf(os.Stderr, "error: %v\n", err)
+	os.Exit(1)
+}
+
 func main() {
 	var (
 		majorFlag = flag.Bool("major", false, "主版本号+1")
@@ -109,17 +114,17 @@ func main() {
 	// 如果没有任何参数，默认 patch
 	currentPath, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	fmt.Println(currentPath)
 	r, err := git.PlainOpen(currentPath)
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	//fmt.Printf("%+v\n", r)
 	remotes, err := r.Remotes()
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	if len(remotes) == 0 {
 		fmt.Fprintln(os.Stderr, "no remotes found in repository")
@@ -132,11 +137,11 @@ func main() {
 	// 获取HEAD历史记录
 	ref, err := r.Head()
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	var allCommits []Commit
 	// 打印所有提交信息
@@ -168,7 +173,7 @@ func main() {
 	//fmt.Printf("commits： %+v\n", allCommits)
 	iter, err := r.Tags()
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	type TagInfo struct {
 		Name   string
@@ -276,7 +281,7 @@ func main() {
 	// 更新ChangeLog
 	tmpl, err := template.New("ChangeLog").Parse(templateChangeLog)
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	data := struct {
 		RepositoryURL string
@@ -292,39 +297,40 @@ func main() {
 	buf := new(bytes.Buffer)
 	err = tmpl.Execute(buf, data)
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	//fmt.Println(buf.String())
 	wt, err := r.Worktree()
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	filename := changeLogFilename
 	err = os.WriteFile(filename, buf.Bytes(), 0644)
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	_, err = wt.Add(filename)
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	// 同步更新 Cargo.toml 中的版本号，并刷新 Cargo.lock
 	if modified, uerr := updateCargoVersion(cargoTomlFilename, newVersion); uerr == nil && modified {
 		if _, err = wt.Add(cargoTomlFilename); err != nil {
-			panic(err)
+			fatal(err)
 		}
 		fmt.Printf("updated %s version to %s\n", cargoTomlFilename, newVersion)
 		// 运行 cargo check 同步 Cargo.lock（只更新当前项目版本号，不碰依赖）
 		cargoLockFile := "Cargo.lock"
 		if _, statErr := os.Stat(cargoLockFile); statErr == nil {
 			cmd := exec.Command("cargo", "check")
+			cmd.Dir = currentPath
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			if runErr := cmd.Run(); runErr != nil {
 				fmt.Fprintf(os.Stderr, "warning: cargo check failed: %v\n", runErr)
 			} else {
 				if _, err = wt.Add(cargoLockFile); err != nil {
-					panic(err)
+					fatal(err)
 				}
 				fmt.Printf("synced %s\n", cargoLockFile)
 			}
@@ -347,11 +353,11 @@ func main() {
 		Committer: &lastSignature,
 	})
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	obj, err := r.CommitObject(commit)
 	if err != nil {
-		panic(err)
+		fatal(err)
 	}
 	fmt.Printf("%+v\n", obj)
 	//err = r.Push(&git.PushOptions{})
