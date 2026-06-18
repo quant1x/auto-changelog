@@ -314,15 +314,14 @@ func main() {
 			panic(err)
 		}
 		fmt.Printf("updated %s version to %s\n", cargoTomlFilename, newVersion)
-		// 运行 cargo generate-lockfile 同步 Cargo.lock
+		// 运行 cargo check 同步 Cargo.lock（只更新当前项目版本号，不碰依赖）
 		cargoLockFile := "Cargo.lock"
-		// 检查 cargo 和 Cargo.lock 是否存在
 		if _, statErr := os.Stat(cargoLockFile); statErr == nil {
-			cmd := exec.Command("cargo", "generate-lockfile")
+			cmd := exec.Command("cargo", "check")
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			if runErr := cmd.Run(); runErr != nil {
-				fmt.Fprintf(os.Stderr, "warning: cargo generate-lockfile failed: %v\n", runErr)
+				fmt.Fprintf(os.Stderr, "warning: cargo check failed: %v\n", runErr)
 			} else {
 				if _, err = wt.Add(cargoLockFile); err != nil {
 					panic(err)
