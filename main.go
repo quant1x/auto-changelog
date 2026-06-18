@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"regexp"
 	"slices"
 	"strings"
@@ -307,12 +308,28 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	// 同步更新 Cargo.toml 中的版本号
+	// 同步更新 Cargo.toml 中的版本号，并刷新 Cargo.lock
 	if modified, uerr := updateCargoVersion(cargoTomlFilename, newVersion); uerr == nil && modified {
 		if _, err = wt.Add(cargoTomlFilename); err != nil {
 			panic(err)
 		}
 		fmt.Printf("updated %s version to %s\n", cargoTomlFilename, newVersion)
+		// 运行 cargo generate-lockfile 同步 Cargo.lock
+		cargoLockFile := "Cargo.lock"
+		// 检查 cargo 和 Cargo.lock 是否存在
+		if _, statErr := os.Stat(cargoLockFile); statErr == nil {
+			cmd := exec.Command("cargo", "generate-lockfile")
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			if runErr := cmd.Run(); runErr != nil {
+				fmt.Fprintf(os.Stderr, "warning: cargo generate-lockfile failed: %v\n", runErr)
+			} else {
+				if _, err = wt.Add(cargoLockFile); err != nil {
+					panic(err)
+				}
+				fmt.Printf("synced %s\n", cargoLockFile)
+			}
+		}
 	}
 	// Ensure we have a valid signature (fallback to last commit's author when no annotated tags exist)
 	if lastSignature.Name == "" && lastSignature.Email == "" {
