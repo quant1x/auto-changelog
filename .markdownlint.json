@@ -1,0 +1,8 @@
+{
+  "default": true,
+  "ignores": [
+    "LICENSE",
+    "CHANGELOG.md",
+    "third_party/NOTICE.md"
+  ]
+}
