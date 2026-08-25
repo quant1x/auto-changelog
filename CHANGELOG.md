@@ -4,9 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.13] - 2026-08-26
+
+- 修复最新版本段缺失 release 提交记录的问题，生成前手动追加本次将创建的 release commit
+- release v1.4.13
+
 ## [1.4.12] - 2026-08-26
 
 - 移除 CHANGELOG 模板中重复的 ### Changed 标题，消除 MD024 重复标题告警
+- release v1.4.12
 
 ## [1.4.11] - 2026-08-26
 
@@ -510,7 +516,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add main application
 - add README
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.12...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.13...HEAD
+[1.4.13]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.12...v1.4.13
 [1.4.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.11...v1.4.12
 [1.4.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.10...v1.4.11
 [1.4.10]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.9...v1.4.10
