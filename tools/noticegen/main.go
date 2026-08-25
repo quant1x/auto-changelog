@@ -26,17 +26,23 @@ import (
 	"text/template"
 )
 
-const (
-	mainModule   = "gitee.com/quant1x/autochangelog"
-	templateFile = "third_party/notice.tmpl"
-	outputFile   = "third_party/NOTICE.txt"
-)
+const mainModule = "gitee.com/quant1x/autochangelog"
 
-// entry 是模板数据源中的单条记录，字段名与 third_party/notice.tmpl 一一对应
+// output 描述一次模板渲染：源模板与目标输出文件
+var outputs = []struct {
+	templateFile string
+	outputFile   string
+}{
+	{"third_party/notice.tmpl", "third_party/NOTICE.txt"},
+	{"third_party/notice.md.tmpl", "third_party/NOTICE.md"},
+}
+
+// entry 是模板数据源中的单条记录，字段名与 third_party/notice*.tmpl 一一对应
 type entry struct {
 	Name        string
 	Version     string
 	LicenseName string
+	LicenseURL  string
 	Copyright   string
 	LicenseText string
 	NoticeText  string
@@ -101,6 +107,7 @@ func main() {
 			Name:        m.path,
 			Version:     m.version,
 			LicenseName: detectLicenseType(licText),
+			LicenseURL:  licenseURL(m.path),
 			Copyright:   cp,
 			LicenseText: licText,
 			NoticeText:  notice,
@@ -114,23 +121,23 @@ func main() {
 	}
 
 	// 4. 渲染模板并写出
-	tmpl, err := template.ParseFiles(templateFile)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "parse template: %v\n", err)
-		os.Exit(1)
+	for _, out := range outputs {
+		tmpl, err := template.ParseFiles(out.templateFile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "parse %s: %v\n", out.templateFile, err)
+			os.Exit(1)
+		}
+		var buf strings.Builder
+		if err := tmpl.Execute(&buf, entries); err != nil {
+			fmt.Fprintf(os.Stderr, "render %s: %v\n", out.templateFile, err)
+			os.Exit(1)
+		}
+		if err := os.WriteFile(out.outputFile, []byte(buf.String()), 0o644); err != nil {
+			fmt.Fprintf(os.Stderr, "write %s: %v\n", out.outputFile, err)
+			os.Exit(1)
+		}
+		fmt.Printf("generated %s: %d modules\n", out.outputFile, len(entries))
 	}
-	var buf strings.Builder
-	if err := tmpl.Execute(&buf, entries); err != nil {
-		fmt.Fprintf(os.Stderr, "render template: %v\n", err)
-		os.Exit(1)
-	}
-	if err := os.WriteFile(outputFile, []byte(buf.String()), 0o644); err != nil {
-		fmt.Fprintf(os.Stderr, "write %s: %v\n", outputFile, err)
-		os.Exit(1)
-	}
-
-	// 5. 摘要
-	fmt.Printf("generated %s: %d modules\n", outputFile, len(entries))
 	if len(noLicense) > 0 {
 		fmt.Printf("WARN no license file: %s\n", strings.Join(noLicense, ", "))
 	}
@@ -144,6 +151,16 @@ func main() {
 
 // licenseFileRe 匹配常见的许可证/版权文件（不区分大小写）
 var licenseFileRe = regexp.MustCompile(`(?i)^(license|licence|copying|copyright)(\..*)?$`)
+
+// majorVersionSuffixRe 匹配 Go 模块路径中的主版本号后缀（/v2 及以上），如 github.com/foo/bar/v2
+var majorVersionSuffixRe = regexp.MustCompile(`/v[2-9][0-9]*$`)
+
+// licenseURL 由模块路径推导仓库主页地址，用于 markdown 输出中的许可证链接。
+// 对 github.com/gitee.com 等常见宿主，去掉主版本号后缀即为仓库根地址；
+// 其余（如 dario.cat/mergo、gopkg.in/warnings.v0）直接使用模块主页（go get 可跳转）。
+func licenseURL(path string) string {
+	return "https://" + majorVersionSuffixRe.ReplaceAllString(path, "")
+}
 
 // findLicense 在模块目录中查找许可证文件并返回其全文
 func findLicense(dir string) (string, bool) {

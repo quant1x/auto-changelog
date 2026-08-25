@@ -9,10 +9,9 @@ The following third-party software is included in this product:
 {{- range . }}
 --------------------------------------------------------------------------------
 {{ .Name }} {{ .Version }}
-{{- if .Copyright }}
-Copyright: {{ .Copyright }}
-{{- end }}
-License: {{ .LicenseName }}
+
+{{ if .Copyright }}Copyright: {{ .Copyright }}
+{{ end }}License: {{ .LicenseName }}
 
 {{- if .LicenseText }}
 {{ .LicenseText }}
