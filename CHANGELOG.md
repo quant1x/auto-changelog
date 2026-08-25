@@ -3,9 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.10] - 2026-08-26
+### Changed
+- 添加 markdownlint 配置，排除非手写的生成文件
+- 修正 markdownlint 配置为 cli2 格式，使 ignores 排除生成文件生效
+
 ## [1.4.9] - 2026-08-26
 ### Changed
 - 新增项目级规则 AGENTS.md（版本策略、提交规范、许可证合规约定）
+- release v1.4.9
 
 ## [1.4.8] - 2026-08-26
 ### Changed
@@ -494,7 +500,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.9...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.10...HEAD
+[1.4.10]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.9...v1.4.10
 [1.4.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.8...v1.4.9
 [1.4.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.7...v1.4.8
 [1.4.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...v1.4.7
