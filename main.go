@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"regexp"
 	"slices"
 	"strings"
 	"text/template"
@@ -19,67 +18,8 @@ import (
 
 const (
 	changeLogFilename   = "CHANGELOG.md"
-	cargoTomlFilename   = "Cargo.toml"
 	defaultFirstVersion = "0.0.0"
 )
-
-// 预编译正则，避免每次调用都编译
-var (
-	// 匹配 [package] 或 [workspace.package] 块
-	sectionRe = regexp.MustCompile(`(?m)^\s*\[(workspace\.)?package\]\s*$`)
-	// 匹配 version = "x.y.z"
-	versionRe = regexp.MustCompile(`(?m)^(\s*version\s*=\s*)".*"\s*$`)
-)
-
-func updateCargoVersion(filePath, newVersion string) (bool, error) {
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		return false, err
-	}
-
-	// 1. 检测原始文件的换行符，防止跨平台换行符被篡改
-	eol := "\n"
-	if bytes.Contains(content, []byte("\r\n")) {
-		eol = "\r\n"
-	}
-
-	// 2. 按行分割，保留空行
-	lines := bytes.Split(content, []byte(eol))
-
-	inTargetSection := false
-	updated := false
-
-	for i, line := range lines {
-		trimmed := bytes.TrimSpace(line)
-
-		// 判断是否进入目标 section
-		if sectionRe.Match(trimmed) {
-			inTargetSection = true
-			continue
-		}
-
-		// 判断是否进入其他 section (离开目标 section)
-		if bytes.HasPrefix(trimmed, []byte("[")) && inTargetSection {
-			inTargetSection = false
-		}
-
-		// 如果在目标 section 内，且匹配到 version，则替换
-		if inTargetSection && versionRe.Match(line) {
-			// 使用正则替换，保留前面的空格和等号
-			newLine := versionRe.ReplaceAll(line, fmt.Appendf(nil, `${1}"%s"`, newVersion))
-			lines[i] = newLine
-			updated = true
-		}
-	}
-
-	if !updated {
-		return false, nil
-	}
-
-	// 3. 使用原始换行符重新拼接
-	newContent := bytes.Join(lines, []byte(eol))
-	return true, os.WriteFile(filePath, newContent, 0644)
-}
 
 func fatal(err error) {
 	fmt.Fprintf(os.Stderr, "error: %v\n", err)
@@ -341,28 +281,12 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
-	// 同步更新 Cargo.toml 中的版本号，并刷新 Cargo.lock
-	if modified, uerr := updateCargoVersion(cargoTomlFilename, newVersion); uerr == nil && modified {
-		if _, err = worktree.Add(cargoTomlFilename); err != nil {
-			fatal(err)
-		}
-		fmt.Printf("updated %s version to %s\n", cargoTomlFilename, newVersion)
-		// 运行 cargo check 同步 Cargo.lock（只更新当前项目版本号，不碰依赖）
-		cargoLockFile := "Cargo.lock"
-		if _, statErr := os.Stat(cargoLockFile); statErr == nil {
-			cmd := exec.Command("cargo", "check")
-			cmd.Dir = currentPath
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			if runErr := cmd.Run(); runErr != nil {
-				fmt.Fprintf(os.Stderr, "warning: cargo check failed: %v\n", runErr)
-			} else {
-				if _, err = worktree.Add(cargoLockFile); err != nil {
-					fatal(err)
-				}
-				fmt.Printf("synced %s\n", cargoLockFile)
-			}
-		}
+	// 同步更新项目清单文件版本（版本更新调度，调用链见 version_updater.go）
+	if err := runVersionUpdate([]VersionUpdater{
+		NewCargoUpdater(currentPath),
+		// NewMavenUpdater(currentPath), // TODO: 预留 Java Maven 支持
+	}, newVersion, worktree); err != nil {
+		fatal(err)
 	}
 	// Ensure we have a valid signature (fallback to last commit's author when no annotated tags exist)
 	if lastSignature.Name == "" && lastSignature.Email == "" {
