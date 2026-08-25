@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.7] - 2026-08-26
+### Changed
+- Add vcpkg license notice generator driven by vcpkg.json manifest dependencies
+
 ## [1.4.6] - 2026-08-25
 ### Changed
 - 新增 --license 参数：输出第三方许可证信息，保障单一可执行文件合规
@@ -24,6 +28,7 @@ All notable changes to this project will be documented in this file.
 - 重新生成 third_party/NOTICE.txt：21 个模块均含版权归属与许可证全文
 - README 更新生成与合规检查命令
 - Add markdown NOTICE.md and blank line after module name in third-party notices
+- release v1.4.6
 
 ## [1.4.5] - 2026-08-25
 ### Changed
@@ -479,7 +484,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.7...HEAD
+[1.4.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...v1.4.7
 [1.4.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...v1.4.6
 [1.4.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...v1.4.5
 [1.4.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...v1.4.4
