@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
 - 调整 imports 分组
 - 修复 minor 版本递增测试期望，补充 major 用例
 - 更新README，同步1.3.x新逻辑（tag按分支隔离、构建要求、Cargo同步说明）
+- release v1.4.0
+- README增加go install安装命令说明
 
 ## [1.3.6] - 2026-06-18
 ### Changed
