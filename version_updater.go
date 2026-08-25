@@ -17,8 +17,9 @@ import (
 //	      │    └─ Update ──► 更新 Cargo.toml ──► cargo check 刷新 Cargo.lock
 //	      │                                   └─► 返回 [Cargo.toml, Cargo.lock]
 //	      │
-//	      └─ MavenUpdater（Java，预留） Supported: 存在 pom.xml
-//	           └─ Update ──► 更新 pom.xml <version> ──► 返回 [pom.xml]
+//	      └─ MavenUpdater（Java）   Supported: 存在 pom.xml
+//	           └─ Update ──► 更新 pom.xml 的 project 直属 <version>
+//	                         └─► 返回 [pom.xml]
 type VersionUpdater interface {
 	// Supported 判断当前项目是否由该更新器管理
 	Supported() bool

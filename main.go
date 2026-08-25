@@ -284,7 +284,7 @@ func main() {
 	// 同步更新项目清单文件版本（版本更新调度，调用链见 version_updater.go）
 	if err := runVersionUpdate([]VersionUpdater{
 		NewCargoUpdater(currentPath),
-		// NewMavenUpdater(currentPath), // TODO: 预留 Java Maven 支持
+		NewMavenUpdater(currentPath),
 	}, newVersion, worktree); err != nil {
 		fatal(err)
 	}
