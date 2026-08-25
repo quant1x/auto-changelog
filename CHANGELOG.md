@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.8] - 2026-08-26
+### Changed
+- Remove legacy shell change script and update README
+
 ## [1.4.7] - 2026-08-26
 ### Changed
 - Add vcpkg license notice generator driven by vcpkg.json manifest dependencies
+- release v1.4.7
 
 ## [1.4.6] - 2026-08-25
 ### Changed
@@ -484,7 +489,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.7...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.8...HEAD
+[1.4.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.7...v1.4.8
 [1.4.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...v1.4.7
 [1.4.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...v1.4.6
 [1.4.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...v1.4.5
