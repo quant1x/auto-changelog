@@ -1,5 +1,7 @@
 {
-  "default": true,
+  "config": {
+    "default": true
+  },
   "ignores": [
     "LICENSE",
     "CHANGELOG.md",
