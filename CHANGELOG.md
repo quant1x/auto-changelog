@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-08-25
+### Changed
+- 调整main.go变量命名，使其更符合语义，无逻辑改动
+- 新增工作区状态检查：有未提交改动时提示退出；最新commit已有tag时提示退出（用系统git判断避免go-git的CRLF误报）
+
 ## [1.4.0] - 2026-08-25
 ### Changed
 - 添加 .gitignore 忽略构建产物与临时文件
@@ -13,6 +18,7 @@ All notable changes to this project will be documented in this file.
 - 更新README，同步1.3.x新逻辑（tag按分支隔离、构建要求、Cargo同步说明）
 - release v1.4.0
 - README增加go install安装命令说明
+- release v1.4.0
 
 ## [1.3.6] - 2026-06-18
 ### Changed
@@ -411,7 +417,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.0...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.1...HEAD
+[1.4.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.0...v1.4.1
 [1.4.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.6...v1.4.0
 [1.3.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.5...v1.3.6
 [1.3.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.4...v1.3.5
