@@ -3,9 +3,14 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.9] - 2026-08-26
+### Changed
+- 新增项目级规则 AGENTS.md（版本策略、提交规范、许可证合规约定）
+
 ## [1.4.8] - 2026-08-26
 ### Changed
 - Remove legacy shell change script and update README
+- release v1.4.8
 
 ## [1.4.7] - 2026-08-26
 ### Changed
@@ -489,7 +494,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.8...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.9...HEAD
+[1.4.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.8...v1.4.9
 [1.4.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.7...v1.4.8
 [1.4.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...v1.4.7
 [1.4.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...v1.4.6
