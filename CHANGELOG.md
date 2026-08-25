@@ -3,6 +3,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.6] - 2026-08-25
+### Changed
+- 新增 --license 参数：输出第三方许可证信息，保障单一可执行文件合规
+
+- 用 google/go-licenses 收集编译进二进制的依赖许可证，生成 third_party/NOTICE.txt
+  （含各依赖版本、SPDX 许可证标识与许可证全文）
+- go:embed 将 NOTICE.txt 嵌入二进制，--license 运行时输出
+- 新增 license_notice.go 与 NOTICE 生成模板 third_party/notice.tmpl
+- README 补充 --license 用法与重新生成/合规检查命令
+- 第三方许可证声明补充 Copyright 与 NOTICE 字段，满足严格法务审计要求
+
+- 新增 tools/noticegen：自研生成器（纯标准库），因 go-licenses report 模板
+  数据源缺少 Copyright/NoticeText 字段
+  - 模块清单取自 go list -deps ./...，与实际编译产物一致
+  - 提取许可证全文、版权声明行（LICENSE 无版权行时从源码头部兜底提取）、
+    NOTICE 文件内容（Apache-2.0 第 4(d) 条要求）
+  - 许可证类型按文本关键词识别 SPDX 标识，支持混合许可（AND 连接）
+- third_party/notice.tmpl 更新为含 Copyright/NoticeText/LicenseText 判空的标准模板
+- 重新生成 third_party/NOTICE.txt：21 个模块均含版权归属与许可证全文
+- README 更新生成与合规检查命令
+- Add markdown NOTICE.md and blank line after module name in third-party notices
+
 ## [1.4.5] - 2026-08-25
 ### Changed
 - 更新 README：新增 --version 用法，补充工作区检查与 Maven 递归支持说明
@@ -11,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - 通过 BuildInfo.Settings 中的 vcs 设置区分构建方式
 - 本地 git 仓库内构建（带 vcs=git）：一律用 git describe 取当前分支最近可达 tag
 - go install 安装（无 VCS 设置）：使用 Go 工具链嵌入的模块版本
+- release v1.4.5
 
 ## [1.4.4] - 2026-08-25
 ### Changed
@@ -456,7 +479,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...HEAD
+[1.4.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...v1.4.6
 [1.4.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...v1.4.5
 [1.4.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...v1.4.4
 [1.4.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.2...v1.4.3
