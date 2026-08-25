@@ -104,9 +104,5 @@ go run github.com/google/go-licenses@latest check ./... \
 
 ## 其他
 
-如需兼容 shell 版本，可参考如下命令：
-
-```shell
-change
-change tag
-```
+- 许可证合规工具：`tools/noticegen`（Go 依赖，见上文「第三方许可证合规」）
+- vcpkg（C++ 依赖）许可证声明生成：`tools/vcpkg_notices.py`
