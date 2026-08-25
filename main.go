@@ -303,6 +303,11 @@ func main() {
 		//return inRange && c2
 		return inRange
 	})
+	// 本次生成将创建的 release commit 尚未存在于 allCommits 中，
+	// 手动追加到新版本段，使 CHANGELOG 最新版本段包含 release 记录
+	version.Commits = append(version.Commits, Commit{
+		Message: fmt.Sprintf("release v%s", newVersion),
+	})
 	allVersions = slices.Insert(allVersions, 0, version)
 	//os.Exit(0)
 	// 更新ChangeLog
