@@ -65,6 +65,12 @@ go build -o autochangelog.exe
 
   版本号取自当前分支最近可达的 tag（通过 `go install` 安装的二进制则取自 Go 工具链嵌入的模块版本），代码不硬编码版本号，打新 tag 即生效。
 
+- 输出第三方许可证信息并退出：
+
+  ```shell
+  autochangelog --license
+  ```
+
 ## 功能说明
 
 - 遍历当前分支所有可达提交，按提交提取 tag，生成 CHANGELOG.md
@@ -74,6 +80,25 @@ go build -o autochangelog.exe
 - 支持主版本、次版本、修订版本递增，默认 patch
 - 存在 Cargo.toml 时同步更新其版本号，并刷新 Cargo.lock
 - 存在 pom.xml 时同步更新其版本号；聚合（multi-module）项目按 `<modules>` 声明的相对路径递归级联，同步各子模块 `<parent>` 版本（嵌套聚合同样支持，不依赖 src 等固定目录）
+
+## 第三方许可证合规
+
+`third_party/NOTICE.txt` 收录了所有编译进二进制的第三方依赖的许可证全文，并随二进制嵌入，可通过 `autochangelog --license` 随时输出，保障单一可执行文件自带合规的许可证信息。
+
+依赖升级后重新生成：
+
+```shell
+go run github.com/google/go-licenses@latest report ./... \
+  --template third_party/notice.tmpl \
+  --ignore gitee.com/quant1x/autochangelog > third_party/NOTICE.txt
+```
+
+合规检查（无缺失/未知许可证）：
+
+```shell
+go run github.com/google/go-licenses@latest check ./... \
+  --ignore gitee.com/quant1x/autochangelog
+```
 
 ## 其他
 

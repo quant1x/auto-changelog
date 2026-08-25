@@ -75,19 +75,25 @@ func main() {
 		minorFlag  = flag.Bool("minor", false, "次版本号+1")
 		patchFlag  = flag.Bool("patch", false, "修订版本号+1 (默认)")
 		versionFlag = flag.Bool("version", false, "输出当前版本并退出")
+		licenseFlag = flag.Bool("license", false, "输出第三方许可证信息并退出")
 	)
 	exeName := os.Args[0]
 	if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
 		exeName = exeName[idx+1:]
 	}
 	flag.Usage = func() {
-		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--version]\n", exeName)
+		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--version] [--license]\n", exeName)
 		fmt.Printf("  --major   主版本号+1\n")
 		fmt.Printf("  --minor   次版本号+1\n")
 		fmt.Printf("  --patch   修订版本号+1 (默认)\n")
 		fmt.Printf("  --version 输出当前版本并退出\n")
+		fmt.Printf("  --license 输出第三方许可证信息并退出\n")
 	}
 	flag.Parse()
+	if *licenseFlag {
+		fmt.Println(noticesText)
+		os.Exit(0)
+	}
 	if *versionFlag {
 		fmt.Printf("%s %s\n", exeName, currentVersion())
 		os.Exit(0)

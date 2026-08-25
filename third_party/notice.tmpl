@@ -1,0 +1,14 @@
+This product includes software developed by third parties.
+
+The autochangelog software itself is distributed under the MIT License
+(see the LICENSE file in this repository).
+
+The following third-party software is included in this product:
+
+{{- range . }}
+--------------------------------------------------------------------------------
+{{ .Name }} {{ .Version }}
+License: {{ .LicenseName }}
+
+{{ .LicenseText }}
+{{ end }}
