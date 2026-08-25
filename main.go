@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime/debug"
 	"slices"
 	"strings"
 	"text/template"
@@ -26,23 +27,59 @@ func fatal(err error) {
 	os.Exit(1)
 }
 
+// currentVersion 返回当前程序版本，由 git tag 决定，代码不硬编码版本号：
+//
+//  1. go install module@vX.Y.Z 安装的二进制：go 工具链已把模块版本号嵌入
+//     BuildInfo（Main.Version），直接取用（安装目录无 .git，无法用 git 查询）；
+//  2. 本地源码 go build / 仓库内运行：Main.Version 为 "(devel)"，
+//     用 git describe 取当前分支最近可达的 tag（从 HEAD 沿祖先链回溯，
+//     天然只看当前分支可达 tag，不受其他分支 tag 污染）；
+//  3. 两者均不可用（如无 tag 的新仓库）时视为初始版本 0.0.0。
+//
+// 打新 tag 即生效，无需变更代码。
+func currentVersion() string {
+	if bi, ok := debug.ReadBuildInfo(); ok {
+		if v := bi.Main.Version; v != "" && v != "(devel)" {
+			// 本地 go build 时 Go 会按 VCS 注入版本，工作树脏时追加 "+dirty"，去掉保持纯 tag 输出
+			return strings.TrimSuffix(v, "+dirty")
+		}
+	}
+	return gitDescribeVersion()
+}
+
+// gitDescribeVersion 用 git describe 取当前分支最近可达 tag
+func gitDescribeVersion() string {
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
+	out, err := cmd.Output()
+	if err != nil {
+		return defaultFirstVersion
+	}
+	return strings.TrimSpace(string(out))
+}
+
 func main() {
 	var (
-		majorFlag = flag.Bool("major", false, "主版本号+1")
-		minorFlag = flag.Bool("minor", false, "次版本号+1")
-		patchFlag = flag.Bool("patch", false, "修订版本号+1 (默认)")
+		majorFlag  = flag.Bool("major", false, "主版本号+1")
+		minorFlag  = flag.Bool("minor", false, "次版本号+1")
+		patchFlag  = flag.Bool("patch", false, "修订版本号+1 (默认)")
+		versionFlag = flag.Bool("version", false, "输出当前版本并退出")
 	)
+	exeName := os.Args[0]
+	if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
+		exeName = exeName[idx+1:]
+	}
 	flag.Usage = func() {
-		exeName := os.Args[0]
-		if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
-			exeName = exeName[idx+1:]
-		}
-		fmt.Printf("Usage: %s [--major] [--minor] [--patch]\n", exeName)
+		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--version]\n", exeName)
 		fmt.Printf("  --major   主版本号+1\n")
 		fmt.Printf("  --minor   次版本号+1\n")
 		fmt.Printf("  --patch   修订版本号+1 (默认)\n")
+		fmt.Printf("  --version 输出当前版本并退出\n")
 	}
 	flag.Parse()
+	if *versionFlag {
+		fmt.Printf("%s %s\n", exeName, currentVersion())
+		os.Exit(0)
+	}
 	verKind := PatchVersion
 	if *majorFlag {
 		verKind = MajorVersion
