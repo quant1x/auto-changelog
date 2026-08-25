@@ -135,24 +135,24 @@ func main() {
 	//fmt.Printf("%+v\n", cfg)
 	repositoryURL := cfg.URLs[0]
 	// 获取HEAD历史记录（遍历当前分支所有可达提交，包含 merge 引入的其他分支提交）
-	ref, err := r.Head()
+	headRef, err := r.Head()
 	if err != nil {
 		fatal(err)
 	}
-	cIter, err := r.Log(&git.LogOptions{From: ref.Hash()})
+	commitIter, err := r.Log(&git.LogOptions{From: headRef.Hash()})
 	if err != nil {
 		fatal(err)
 	}
 	var allCommits []Commit
 	// 打印所有提交信息
-	err = cIter.ForEach(func(c *object.Commit) error {
-		hash := c.ID()
+	err = commitIter.ForEach(func(commitObj *object.Commit) error {
+		commitHash := commitObj.ID()
 		commit := Commit{
-			Id:        hash.String(),
-			Author:    c.Committer.Name,
-			Time:      c.Committer.When,
-			Message:   strings.TrimSpace(c.Message),
-			Signature: c.Author, // for commit message
+			Id:        commitHash.String(),
+			Author:    commitObj.Committer.Name,
+			Time:      commitObj.Committer.When,
+			Message:   strings.TrimSpace(commitObj.Message),
+			Signature: commitObj.Author, // for commit message
 		}
 		//fmt.Println(commit)
 		allCommits = append(allCommits, commit)
@@ -166,9 +166,9 @@ func main() {
 	//	return int(a.Time.UnixMilli() - b.Time.UnixMilli())
 	//})
 	slices.Reverse(allCommits)
-	lastCommit := allCommits[len(allCommits)-1]
-	lastCommitId := lastCommit.Id
-	//fmt.Printf("lastCommitId: %s\n", lastCommitId)
+	newestCommit := allCommits[len(allCommits)-1]
+	newestCommitId := newestCommit.Id
+	//fmt.Printf("newestCommitId: %s\n", newestCommitId)
 	//os.Exit(1)
 	//fmt.Printf("commits： %+v\n", allCommits)
 	// 从当前分支的 commit 中提取 tag 列表：
@@ -179,93 +179,93 @@ func main() {
 		Time   time.Time
 		Commit *object.Commit
 	}
-	tagByCommit := make(map[string][]TagInfo)
-	iter, err := r.Tags()
+	tagsByCommit := make(map[string][]TagInfo)
+	tagIter, err := r.Tags()
 	if err != nil {
 		fatal(err)
 	}
-	_ = iter.ForEach(func(ref *plumbing.Reference) error {
-		hash := ref.Hash()
+	_ = tagIter.ForEach(func(tagRef *plumbing.Reference) error {
+		tagHash := tagRef.Hash()
 		// try annotated tag first
-		obj, err := r.TagObject(hash)
+		tagObj, err := r.TagObject(tagHash)
 		if err == nil {
-			c, _ := obj.Commit()
-			if c != nil {
-				tagByCommit[c.ID().String()] = append(tagByCommit[c.ID().String()], TagInfo{
-					Name: ref.Name().Short(), Time: obj.Tagger.When, Commit: c,
+			annotatedCommit, _ := tagObj.Commit()
+			if annotatedCommit != nil {
+				tagsByCommit[annotatedCommit.ID().String()] = append(tagsByCommit[annotatedCommit.ID().String()], TagInfo{
+					Name: tagRef.Name().Short(), Time: tagObj.Tagger.When, Commit: annotatedCommit,
 				})
 			}
 			return nil
 		}
 		// fallback to lightweight tag (points directly to a commit)
-		c, cerr := r.CommitObject(hash)
+		lightweightCommit, cerr := r.CommitObject(tagHash)
 		if cerr == nil {
-			tagByCommit[c.ID().String()] = append(tagByCommit[c.ID().String()], TagInfo{
-				Name: ref.Name().Short(), Time: c.Committer.When, Commit: c,
+			tagsByCommit[lightweightCommit.ID().String()] = append(tagsByCommit[lightweightCommit.ID().String()], TagInfo{
+				Name: tagRef.Name().Short(), Time: lightweightCommit.Committer.When, Commit: lightweightCommit,
 			})
 		}
 		return nil
 	})
 	var tags []TagInfo
-	for _, c := range allCommits {
-		if ts, ok := tagByCommit[c.Id]; ok {
-			tags = append(tags, ts...)
+	for _, commit := range allCommits {
+		if tagInfos, ok := tagsByCommit[commit.Id]; ok {
+			tags = append(tags, tagInfos...)
 		}
 	}
 	slices.SortFunc(tags, func(a, b TagInfo) int {
-		av := fixVersion(a.Name)
-		bv := fixVersion(b.Name)
-		return cmpVersion(av, bv)
+		verA := fixVersion(a.Name)
+		verB := fixVersion(b.Name)
+		return cmpVersion(verA, verB)
 	})
 	var allVersions []TagCommits
 
 	oldest := defaultFirstVersion
 	//current := defaultFirstVersion
 	latest := defaultFirstVersion
-	lastVersion := defaultFirstVersion
-	lastTime := time.Unix(0, 0)
+	previousVersion := defaultFirstVersion
+	lastTagTime := time.Unix(0, 0)
 
 	var lastSignature object.Signature
-	for _, obj := range tags {
-		latest = fixVersion(obj.Name)
+	for _, tag := range tags {
+		latest = fixVersion(tag.Name)
 		if oldest == defaultFirstVersion {
 			oldest = latest
 		}
-		tagTime := obj.Time
+		tagTime := tag.Time
 		tagDate := tagTime.Format(time.DateOnly)
 		version := TagCommits{
-			Tag:      obj.Name,
+			Tag:      tag.Name,
 			Version:  latest,
-			Previous: lastVersion,
+			Previous: previousVersion,
 			Date:     tagDate,
 			//RepositoryURL: repositoryURL,
 			Oldest: oldest,
 		}
 		// commit object for this tag
-		c := obj.Commit
+		tagCommit := tag.Commit
 		version.Time = tagTime
-		if c != nil {
-			version.CommitId = c.ID().String()
+		if tagCommit != nil {
+			version.CommitId = tagCommit.ID().String()
 		}
 		version.Commits = Filter(allCommits, func(commit Commit) bool {
-			tm := commit.Time
-			c1 := tm.After(lastTime) && !tm.After(version.Time)
+			commitTime := commit.Time
+			inRange := commitTime.After(lastTagTime) && !commitTime.After(version.Time)
 			// capture last signature of commits in range
 			lastSignature = commit.Signature
-			return c1
+			return inRange
 		})
 		if latest != defaultFirstVersion {
 			allVersions = append(allVersions, version)
 		}
-		lastTime = version.Time
-		lastVersion = latest
+		lastTagTime = version.Time
+		previousVersion = latest
 	}
 	slices.SortFunc(allVersions, func(a, b TagCommits) int {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
 	if len(allVersions) > 0 {
-		lastTagCommitId := allVersions[0].CommitId
-		if lastTagCommitId == lastCommitId {
+		newestTagCommitId := allVersions[0].CommitId
+		if newestTagCommitId == newestCommitId {
 			fmt.Println("tag no changed")
 			os.Exit(0)
 		}
@@ -276,7 +276,7 @@ func main() {
 	version := TagCommits{
 		Tag:      tag,
 		Version:  newVersion,
-		Previous: lastVersion,
+		Previous: previousVersion,
 		Date:     now.Format(time.DateOnly),
 		//RepositoryURL: repositoryURL,
 		Oldest: oldest,
@@ -284,11 +284,11 @@ func main() {
 	latest = newVersion
 	version.Time = now
 	version.Commits = Filter(allCommits, func(commit Commit) bool {
-		tm := commit.Time
-		c1 := tm.After(lastTime) && !tm.After(version.Time)
+		commitTime := commit.Time
+		inRange := commitTime.After(lastTagTime) && !commitTime.After(version.Time)
 		//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
-		//return c1 && c2
-		return c1
+		//return inRange && c2
+		return inRange
 	})
 	allVersions = slices.Insert(allVersions, 0, version)
 	//os.Exit(0)
@@ -314,7 +314,7 @@ func main() {
 		fatal(err)
 	}
 	//fmt.Println(buf.String())
-	wt, err := r.Worktree()
+	worktree, err := r.Worktree()
 	if err != nil {
 		fatal(err)
 	}
@@ -323,13 +323,13 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
-	_, err = wt.Add(filename)
+	_, err = worktree.Add(filename)
 	if err != nil {
 		fatal(err)
 	}
 	// 同步更新 Cargo.toml 中的版本号，并刷新 Cargo.lock
 	if modified, uerr := updateCargoVersion(cargoTomlFilename, newVersion); uerr == nil && modified {
-		if _, err = wt.Add(cargoTomlFilename); err != nil {
+		if _, err = worktree.Add(cargoTomlFilename); err != nil {
 			fatal(err)
 		}
 		fmt.Printf("updated %s version to %s\n", cargoTomlFilename, newVersion)
@@ -343,7 +343,7 @@ func main() {
 			if runErr := cmd.Run(); runErr != nil {
 				fmt.Fprintf(os.Stderr, "warning: cargo check failed: %v\n", runErr)
 			} else {
-				if _, err = wt.Add(cargoLockFile); err != nil {
+				if _, err = worktree.Add(cargoLockFile); err != nil {
 					fatal(err)
 				}
 				fmt.Printf("synced %s\n", cargoLockFile)
@@ -362,36 +362,36 @@ func main() {
 		}
 	}
 	lastSignature.When = time.Now()
-	commit, err := wt.Commit(fmt.Sprintf("release v%s", newVersion), &git.CommitOptions{
+	commitHash, err := worktree.Commit(fmt.Sprintf("release v%s", newVersion), &git.CommitOptions{
 		Author:    &lastSignature,
 		Committer: &lastSignature,
 	})
 	if err != nil {
 		fatal(err)
 	}
-	obj, err := r.CommitObject(commit)
+	createdCommit, err := r.CommitObject(commitHash)
 	if err != nil {
 		fatal(err)
 	}
-	fmt.Printf("%+v\n", obj)
+	fmt.Printf("%+v\n", createdCommit)
 	//err = r.Push(&git.PushOptions{})
 	//if err != nil {
 	//	panic(err)
 	//}
-	h, err := r.Head()
+	head, err := r.Head()
 	if err != nil {
 		fmt.Printf("get HEAD error: %s", err)
 		os.Exit(1)
 	}
 	// 新tag
-	message := fmt.Sprintf("Release version %s", newVersion)
-	_, err = r.CreateTag(tag, h.Hash(), &git.CreateTagOptions{
-		Message: message,
+	tagMessage := fmt.Sprintf("Release version %s", newVersion)
+	_, err = r.CreateTag(tag, head.Hash(), &git.CreateTagOptions{
+		Message: tagMessage,
 	})
 	if err != nil {
 		fmt.Printf("%+v\n", err)
 	} else {
-		fmt.Printf("new tag, %s\n", message)
+		fmt.Printf("new tag, %s\n", tagMessage)
 		fmt.Println("Auto ChangeLog, OK.")
 	}
 }
