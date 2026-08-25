@@ -29,22 +29,34 @@ func fatal(err error) {
 
 // currentVersion 返回当前程序版本，由 git tag 决定，代码不硬编码版本号：
 //
-//  1. go install module@vX.Y.Z 安装的二进制：go 工具链已把模块版本号嵌入
-//     BuildInfo（Main.Version），直接取用（安装目录无 .git，无法用 git 查询）；
-//  2. 本地源码 go build / 仓库内运行：Main.Version 为 "(devel)"，
-//     用 git describe 取当前分支最近可达的 tag（从 HEAD 沿祖先链回溯，
+//  1. go install module@vX.Y.Z 安装的二进制：从模块代理构建，无 VCS 设置，
+//     直接用 go 工具链嵌入的模块版本 Main.Version；
+//  2. 本地 git 仓库内 go build：带 VCS 设置（vcs=git），此时 Main.Version
+//     可能是伪版本（如 v1.4.4-0.20260825042314-cb7499fd4eed）或 "+dirty"，
+//     一律改用 git describe 取当前分支最近可达的 tag（从 HEAD 沿祖先链回溯，
 //     天然只看当前分支可达 tag，不受其他分支 tag 污染）；
 //  3. 两者均不可用（如无 tag 的新仓库）时视为初始版本 0.0.0。
 //
 // 打新 tag 即生效，无需变更代码。
 func currentVersion() string {
 	if bi, ok := debug.ReadBuildInfo(); ok {
-		if v := bi.Main.Version; v != "" && v != "(devel)" {
-			// 本地 go build 时 Go 会按 VCS 注入版本，工作树脏时追加 "+dirty"，去掉保持纯 tag 输出
-			return strings.TrimSuffix(v, "+dirty")
+		if !hasVCSSetting(bi) {
+			if v := bi.Main.Version; v != "" && v != "(devel)" {
+				return v
+			}
 		}
 	}
 	return gitDescribeVersion()
+}
+
+// hasVCSSetting 判断构建时是否带 VCS 信息（本地 git 仓库内构建会有 vcs=git 等设置）
+func hasVCSSetting(bi *debug.BuildInfo) bool {
+	for _, s := range bi.Settings {
+		if s.Key == "vcs" {
+			return true
+		}
+	}
+	return false
 }
 
 // gitDescribeVersion 用 git describe 取当前分支最近可达 tag
