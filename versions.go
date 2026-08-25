@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/go-git/go-git/v5/plumbing/object"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-git/go-git/v5/plumbing/object"
 )
 
 type TagCommits struct {
