@@ -1,0 +1,48 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+*.copy
+
+*.csv
+__pycache__/
+.eggs/
+build/
+dist/
+*.egg-info/
+
+*.png
+*.pkl
+
+#visual studio
+.vs/
+out/
+
+# CMake specific
+*build*/
+cmake-build*/
+
+# vcpkg specific
+vcpkg_installed/
+
+# Rust specific
+target/
+
+# CLion
+.cache/
+
+.env
+
+# vscode
+.vscode/launch.json
+
+# setuptools_scm generated version file
+_version.py
