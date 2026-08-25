@@ -66,7 +66,7 @@ func updateCargoVersion(filePath, newVersion string) (bool, error) {
 		// 如果在目标 section 内，且匹配到 version，则替换
 		if inTargetSection && versionRe.Match(line) {
 			// 使用正则替换，保留前面的空格和等号
-			newLine := versionRe.ReplaceAll(line, []byte(fmt.Sprintf(`${1}"%s"`, newVersion)))
+			newLine := versionRe.ReplaceAll(line, fmt.Appendf(nil, `${1}"%s"`, newVersion))
 			lines[i] = newLine
 			updated = true
 		}
@@ -134,7 +134,7 @@ func main() {
 	cfg := remote.Config()
 	//fmt.Printf("%+v\n", cfg)
 	repositoryURL := cfg.URLs[0]
-	// 获取HEAD历史记录
+	// 获取HEAD历史记录（遍历当前分支所有可达提交，包含 merge 引入的其他分支提交）
 	ref, err := r.Head()
 	if err != nil {
 		fatal(err)
@@ -171,33 +171,47 @@ func main() {
 	//fmt.Printf("lastCommitId: %s\n", lastCommitId)
 	//os.Exit(1)
 	//fmt.Printf("commits： %+v\n", allCommits)
-	iter, err := r.Tags()
-	if err != nil {
-		fatal(err)
-	}
+	// 从当前分支的 commit 中提取 tag 列表：
+	// 1. 遍历仓库全部 tag，建立 commit hash -> tag 的映射
+	// 2. 遍历当前分支的 commit（allCommits），取出每个 commit 上的 tag
 	type TagInfo struct {
 		Name   string
 		Time   time.Time
 		Commit *object.Commit
 	}
-	var tags []TagInfo
+	tagByCommit := make(map[string][]TagInfo)
+	iter, err := r.Tags()
+	if err != nil {
+		fatal(err)
+	}
 	_ = iter.ForEach(func(ref *plumbing.Reference) error {
 		hash := ref.Hash()
 		// try annotated tag first
 		obj, err := r.TagObject(hash)
 		if err == nil {
 			c, _ := obj.Commit()
-			tags = append(tags, TagInfo{Name: ref.Name().Short(), Time: obj.Tagger.When, Commit: c})
+			if c != nil {
+				tagByCommit[c.ID().String()] = append(tagByCommit[c.ID().String()], TagInfo{
+					Name: ref.Name().Short(), Time: obj.Tagger.When, Commit: c,
+				})
+			}
 			return nil
 		}
 		// fallback to lightweight tag (points directly to a commit)
 		c, cerr := r.CommitObject(hash)
 		if cerr == nil {
-			tags = append(tags, TagInfo{Name: ref.Name().Short(), Time: c.Committer.When, Commit: c})
-			return nil
+			tagByCommit[c.ID().String()] = append(tagByCommit[c.ID().String()], TagInfo{
+				Name: ref.Name().Short(), Time: c.Committer.When, Commit: c,
+			})
 		}
 		return nil
 	})
+	var tags []TagInfo
+	for _, c := range allCommits {
+		if ts, ok := tagByCommit[c.Id]; ok {
+			tags = append(tags, ts...)
+		}
+	}
 	slices.SortFunc(tags, func(a, b TagInfo) int {
 		av := fixVersion(a.Name)
 		bv := fixVersion(b.Name)
