@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.5] - 2026-08-25
+### Changed
+- 更新 README：新增 --version 用法，补充工作区检查与 Maven 递归支持说明
+- 修复 --version 本地构建输出 Go 推导伪版本的问题
+
+- 通过 BuildInfo.Settings 中的 vcs 设置区分构建方式
+- 本地 git 仓库内构建（带 vcs=git）：一律用 git describe 取当前分支最近可达 tag
+- go install 安装（无 VCS 设置）：使用 Go 工具链嵌入的模块版本
+
 ## [1.4.4] - 2026-08-25
 ### Changed
 - 新增 --version 参数：输出当前版本，版本号由 git tag 决定不硬编码
@@ -11,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - 本地构建/仓库内运行时用 git describe --tags --abbrev=0 取当前分支最近可达 tag
 - 裁剪本地 VCS 注入的 "+dirty" 后缀，保持纯 tag 输出
 - 无 tag 时输出初始版本 0.0.0
+- release v1.4.4
 
 ## [1.4.3] - 2026-08-25
 ### Changed
@@ -446,7 +456,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...HEAD
+[1.4.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...v1.4.5
 [1.4.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...v1.4.4
 [1.4.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.2...v1.4.3
 [1.4.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.1...v1.4.2
