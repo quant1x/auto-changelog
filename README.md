@@ -7,9 +7,23 @@ AutoChangeLog 是一个用于自动为 git 仓库生成和维护 CHANGELOG.md，
 
 支持多主版本分支并行：tag 按当前分支提取，各分支的 CHANGELOG 与版本号互不污染。低版本分支进入维护期（封版）后，可与最新分支各自独立发展，互不干扰。
 
+## 安装
+
+使用 Go 工具链安装（需要 Go 1.27 及以上版本）：
+
+```shell
+go install gitee.com/quant1x/autochangelog@latest
+```
+
+如需安装指定版本，可将 `@latest` 替换为版本号，例如：
+
+```shell
+go install gitee.com/quant1x/autochangelog@v1.4.0
+```
+
 ## 构建
 
-需要 Go 1.27 及以上版本：
+从源码构建：
 
 ```shell
 go build -o autochangelog.exe
