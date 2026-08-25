@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.4] - 2026-08-25
+### Changed
+- 新增 --version 参数：输出当前版本，版本号由 git tag 决定不硬编码
+
+- 优先读取 go 工具链嵌入二进制的模块版本（go install module@vX.Y.Z 场景）
+- 本地构建/仓库内运行时用 git describe --tags --abbrev=0 取当前分支最近可达 tag
+- 裁剪本地 VCS 注入的 "+dirty" 后缀，保持纯 tag 输出
+- 无 tag 时输出初始版本 0.0.0
+
 ## [1.4.3] - 2026-08-25
 ### Changed
 - 新增 Java Maven 版本更新支持，聚合 POM 按约定路径递归级联
@@ -15,6 +24,7 @@ All notable changes to this project will be documented in this file.
   - 用 XML 栈层级只识别 <project><modules> 直属模块，避免误抓 profile
 - main.go 启用 MavenUpdater
 - version_updater.go 更新调用链注释
+- release v1.4.3
 
 ## [1.4.2] - 2026-08-25
 ### Changed
@@ -436,7 +446,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...HEAD
+[1.4.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...v1.4.4
 [1.4.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.2...v1.4.3
 [1.4.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.1...v1.4.2
 [1.4.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.0...v1.4.1
