@@ -26,7 +26,15 @@ func Test_incrVersion(t *testing.T) {
 				v:    "0.3.4",
 				kind: MinorVersion,
 			},
-			want: "0.3.5",
+			want: "0.4.0",
+		},
+		{
+			name: "major-1",
+			args: args{
+				v:    "0.3.4",
+				kind: MajorVersion,
+			},
+			want: "1.0.0",
 		},
 	}
 	for _, tt := range tests {
