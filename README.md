@@ -18,7 +18,7 @@ go install gitee.com/quant1x/autochangelog@latest
 如需安装指定版本，可将 `@latest` 替换为版本号，例如：
 
 ```shell
-go install gitee.com/quant1x/autochangelog@v1.4.0
+go install gitee.com/quant1x/autochangelog@v1.4.3
 ```
 
 ## 构建
@@ -57,13 +57,23 @@ go build -o autochangelog.exe
   autochangelog --major
   ```
 
+- 输出当前版本并退出：
+
+  ```shell
+  autochangelog --version
+  ```
+
+  版本号取自当前分支最近可达的 tag（通过 `go install` 安装的二进制则取自 Go 工具链嵌入的模块版本），代码不硬编码版本号，打新 tag 即生效。
+
 ## 功能说明
 
 - 遍历当前分支所有可达提交，按提交提取 tag，生成 CHANGELOG.md
 - tag 按当前分支隔离，多主版本分支并行互不污染
-- 自动递增版本号并打新 tag；若最后一次 tag 已包含最新提交则自动跳过
+- 自动递增版本号并打新 tag；若最新提交上已有 tag 则提示并跳过
+- 工作区存在未提交改动时提示退出，避免生成结果不准确
 - 支持主版本、次版本、修订版本递增，默认 patch
 - 存在 Cargo.toml 时同步更新其版本号，并刷新 Cargo.lock
+- 存在 pom.xml 时同步更新其版本号；聚合（multi-module）项目按 `<modules>` 声明的相对路径递归级联，同步各子模块 `<parent>` 版本（嵌套聚合同样支持，不依赖 src 等固定目录）
 
 ## 其他
 
