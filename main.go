@@ -121,6 +121,22 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
+	// 检查工作区是否干净：存在未提交改动时，生成结果可能不准确，直接提示退出。
+	// 用系统 git 判断，避免 go-git 对 CRLF/autocrlf 文件（如 change 脚本）的换行误报
+	statusCmd := exec.Command("git", "status", "--porcelain")
+	statusCmd.Dir = currentPath
+	statusOut, statusErr := statusCmd.Output()
+	if statusErr != nil {
+		fatal(statusErr)
+	}
+	if len(strings.TrimSpace(string(statusOut))) > 0 {
+		fmt.Fprintln(os.Stderr, "working tree has uncommitted change(s); commit or stash them first")
+		os.Exit(1)
+	}
+	worktree, err := r.Worktree()
+	if err != nil {
+		fatal(err)
+	}
 	//fmt.Printf("%+v\n", r)
 	remotes, err := r.Remotes()
 	if err != nil {
@@ -212,6 +228,15 @@ func main() {
 			tags = append(tags, tagInfos...)
 		}
 	}
+	// 当前最新 commit 上已有 tag，说明该提交已发布过，无需生成新版本
+	if tagInfos, ok := tagsByCommit[newestCommitId]; ok {
+		names := make([]string, 0, len(tagInfos))
+		for _, tagInfo := range tagInfos {
+			names = append(names, tagInfo.Name)
+		}
+		fmt.Printf("the latest commit is already tagged (%s); nothing to do\n", strings.Join(names, ", "))
+		os.Exit(0)
+	}
 	slices.SortFunc(tags, func(a, b TagInfo) int {
 		verA := fixVersion(a.Name)
 		verB := fixVersion(b.Name)
@@ -263,13 +288,6 @@ func main() {
 	slices.SortFunc(allVersions, func(a, b TagCommits) int {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
-	if len(allVersions) > 0 {
-		newestTagCommitId := allVersions[0].CommitId
-		if newestTagCommitId == newestCommitId {
-			fmt.Println("tag no changed")
-			os.Exit(0)
-		}
-	}
 	newVersion := incrVersion(latest, verKind)
 	tag := fmt.Sprintf("v%s", newVersion)
 	now := time.Now()
@@ -314,10 +332,6 @@ func main() {
 		fatal(err)
 	}
 	//fmt.Println(buf.String())
-	worktree, err := r.Worktree()
-	if err != nil {
-		fatal(err)
-	}
 	filename := changeLogFilename
 	err = os.WriteFile(filename, buf.Bytes(), 0644)
 	if err != nil {
