@@ -3,9 +3,23 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.3] - 2026-08-25
+### Changed
+- 新增 Java Maven 版本更新支持，聚合 POM 按约定路径递归级联
+
+- 新增 version_updater_maven.go：实现 VersionUpdater 接口
+  - 更新根 pom.xml 的 project 直属 <version>
+  - <module> 路径按 pom 声明解析（相对各自 pom 目录），不假设固定目录
+  - BFS 递归遍历嵌套聚合模块，级联同步各模块 <parent> 版本
+  - <parent> GAV 匹配直接父 pom，嵌套场景版本同步正确
+  - 用 XML 栈层级只识别 <project><modules> 直属模块，避免误抓 profile
+- main.go 启用 MavenUpdater
+- version_updater.go 更新调用链注释
+
 ## [1.4.2] - 2026-08-25
 ### Changed
 - 抽象版本更新流程：新增VersionUpdater接口与调度入口，Cargo实现独立为version_updater_cargo.go，预留Java Maven扩展
+- release v1.4.2
 
 ## [1.4.1] - 2026-08-25
 ### Changed
@@ -422,7 +436,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.2...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...HEAD
+[1.4.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.2...v1.4.3
 [1.4.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.1...v1.4.2
 [1.4.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.0...v1.4.1
 [1.4.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.6...v1.4.0
