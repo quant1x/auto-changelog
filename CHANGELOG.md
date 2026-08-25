@@ -3,9 +3,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-25
+### Changed
+- 添加 .gitignore 忽略构建产物与临时文件
+- 回退 go-git 至 v5.19.2，Go 版本升级至 1.27.0
+- 重构 tag 收集：从当前分支 commit 中提取 tag 列表
+- 调整 imports 分组
+- 修复 minor 版本递增测试期望，补充 major 用例
+- 更新README，同步1.3.x新逻辑（tag按分支隔离、构建要求、Cargo同步说明）
+
 ## [1.3.6] - 2026-06-18
 ### Changed
 - refactor: replace panic with fatal for better UX
+- release v1.3.6
 
 ## [1.3.5] - 2026-06-18
 ### Changed
@@ -399,7 +409,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.6...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.0...HEAD
+[1.4.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.6...v1.4.0
 [1.3.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.5...v1.3.6
 [1.3.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.4...v1.3.5
 [1.3.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.3...v1.3.4
