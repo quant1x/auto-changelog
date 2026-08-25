@@ -1,14 +1,29 @@
 This product includes software developed by third parties.
 
+{{- /* 注意：如果是你自己的产品，请把 autochangelog 替换为你的产品名 */}}
 The autochangelog software itself is distributed under the MIT License
-(see the LICENSE file in this repository).
+(see the LICENSE file in the source code repository).
 
 The following third-party software is included in this product:
 
 {{- range . }}
 --------------------------------------------------------------------------------
 {{ .Name }} {{ .Version }}
+{{- if .Copyright }}
+Copyright: {{ .Copyright }}
+{{- end }}
 License: {{ .LicenseName }}
 
+{{- if .LicenseText }}
 {{ .LicenseText }}
+{{- else }}
+[License text not available, please refer to the official repository]
+{{- end }}
+
+{{- /* 专门处理 Apache 2.0 等协议要求的 NOTICE 文件 */}}
+{{- if .NoticeText }}
+
+NOTICE FILE CONTENTS:
+{{ .NoticeText }}
+{{- end }}
 {{ end }}

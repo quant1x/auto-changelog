@@ -1,13 +1,13 @@
-﻿This product includes software developed by third parties.
-
+This product includes software developed by third parties.
 The autochangelog software itself is distributed under the MIT License
-(see the LICENSE file in this repository).
+(see the LICENSE file in the source code repository).
 
 The following third-party software is included in this product:
 --------------------------------------------------------------------------------
 dario.cat/mergo v1.0.2
+Copyright: Copyright (c) 2013 Dario Castañé. All rights reserved.
+Copyright (c) 2012 The Go Authors. All rights reserved.
 License: BSD-3-Clause
-
 Copyright (c) 2013 Dario Castañé. All rights reserved.
 Copyright (c) 2012 The Go Authors. All rights reserved.
 
@@ -40,8 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 github.com/Microsoft/go-winio v0.6.2
+Copyright: Copyright (c) 2015 Microsoft
 License: MIT
-
 The MIT License (MIT)
 
 Copyright (c) 2015 Microsoft
@@ -68,8 +68,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 github.com/ProtonMail/go-crypto v1.4.1
+Copyright: Copyright (c) 2009 The Go Authors. All rights reserved.
 License: BSD-3-Clause
-
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -101,8 +101,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 github.com/cloudflare/circl v1.6.5
+Copyright: Copyright (c) 2019 Cloudflare. All rights reserved.
+Copyright (c) 2009 The Go Authors. All rights reserved.
 License: BSD-3-Clause
-
 Copyright (c) 2019 Cloudflare. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -164,8 +165,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 github.com/cyphar/filepath-securejoin v0.7.0
-License: MPL-2.0
-
+Copyright: Copyright (C) 2014-2015 Docker Inc & Go Authors. All rights reserved.
+Copyright (C) 2017-2024 SUSE LLC. All rights reserved.
+License: BSD-3-Clause AND MPL-2.0
 ## COPYING ##
 
 `SPDX-License-Identifier: BSD-3-Clause AND MPL-2.0`
@@ -617,8 +619,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 --------------------------------------------------------------------------------
 github.com/emirpasic/gods v1.18.1
-License: BSD-2-Clause
-
+Copyright: Copyright (c) 2015, Emir Pasic
+Copyright (c) 2017 Benjamin Scher Purcell <benjapurcell@gmail.com>
+License: BSD-2-Clause AND ISC
 Copyright (c) 2015, Emir Pasic
 All rights reserved.
 
@@ -664,8 +667,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
 github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376
+Copyright: Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
 License: BSD-3-Clause
-
 Copyright (c) 2012 Péter Surányi. Portions Copyright (c) 2009 The Go
 Authors. All rights reserved.
 
@@ -698,8 +701,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 github.com/go-git/go-billy/v5 v5.9.1
+Copyright: Copyright 2017 Sourced Technologies S.L.
 License: Apache-2.0
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -905,8 +908,8 @@ License: Apache-2.0
 
 --------------------------------------------------------------------------------
 github.com/go-git/go-git/v5 v5.19.2
+Copyright: Copyright 2018 Sourced Technologies, S.L.
 License: Apache-2.0
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -1111,9 +1114,10 @@ License: Apache-2.0
 
 
 --------------------------------------------------------------------------------
-github.com/golang/groupcache/lru v0.0.0-20241129210726-2c02b8208cf8
+github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8
+Copyright: Copyright 2012 Google Inc.
+Copyright 2013 Google Inc.
 License: Apache-2.0
-
 Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/
@@ -1308,9 +1312,9 @@ third-party archives.
 
 
 --------------------------------------------------------------------------------
-github.com/jbenet/go-context/io v0.0.0-20150711004518-d14ea06fba99
+github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99
+Copyright: Copyright (c) 2014 Juan Batiz-Benet
 License: MIT
-
 The MIT License (MIT)
 
 Copyright (c) 2014 Juan Batiz-Benet
@@ -1336,8 +1340,9 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 github.com/kevinburke/ssh_config v1.6.0
+Copyright: Copyright (c) 2017 Kevin Burke.
+Copyright (c) 2013 - 2017 Thomas Pelletier, Eric Anderton
 License: MIT
-
 Copyright (c) 2017 Kevin Burke.
 
 Permission is hereby granted, free of charge, to any person
@@ -1391,8 +1396,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 github.com/klauspost/cpuid/v2 v2.4.0
+Copyright: Copyright (c) 2015 Klaus Post
 License: MIT
-
 The MIT License (MIT)
 
 Copyright (c) 2015 Klaus Post
@@ -1419,8 +1424,8 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 github.com/pjbgf/sha1cd v0.6.0
+Copyright: Copyright 2023 pjbgf
 License: Apache-2.0
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -1625,9 +1630,9 @@ License: Apache-2.0
 
 
 --------------------------------------------------------------------------------
-github.com/sergi/go-diff/diffmatchpatch v1.4.0
+github.com/sergi/go-diff v1.4.0
+Copyright: Copyright (c) 2012-2016 The go-diff Authors. All rights reserved.
 License: MIT
-
 Copyright (c) 2012-2016 The go-diff Authors. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -1653,7 +1658,6 @@ DEALINGS IN THE SOFTWARE.
 --------------------------------------------------------------------------------
 github.com/skeema/knownhosts v1.3.2
 License: Apache-2.0
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -1857,10 +1861,27 @@ License: Apache-2.0
    limitations under the License.
 
 
+NOTICE FILE CONTENTS:
+Copyright 2025 Skeema LLC and the Skeema Knownhosts authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+
 --------------------------------------------------------------------------------
 github.com/xanzy/ssh-agent v0.3.3
+Copyright: Copyright (c) 2014 David Mzareulyan
+Copyright 2015, Sander van Harmelen
 License: Apache-2.0
-
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -2067,8 +2088,8 @@ License: Apache-2.0
 
 --------------------------------------------------------------------------------
 golang.org/x/crypto v0.55.0
+Copyright: Copyright 2009 The Go Authors.
 License: BSD-3-Clause
-
 Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
@@ -2100,8 +2121,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 golang.org/x/net v0.58.0
+Copyright: Copyright 2009 The Go Authors.
 License: BSD-3-Clause
-
 Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
@@ -2133,8 +2154,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 golang.org/x/sys v0.47.0
+Copyright: Copyright 2009 The Go Authors.
 License: BSD-3-Clause
-
 Copyright 2009 The Go Authors.
 
 Redistribution and use in source and binary forms, with or without
@@ -2166,8 +2187,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 gopkg.in/warnings.v0 v0.1.2
+Copyright: Copyright (c) 2016 Péter Surányi.
 License: BSD-2-Clause
-
 Copyright (c) 2016 Péter Surányi.
 
 Redistribution and use in source and binary forms, with or without

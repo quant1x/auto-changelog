@@ -83,15 +83,17 @@ go build -o autochangelog.exe
 
 ## 第三方许可证合规
 
-`third_party/NOTICE.txt` 收录了所有编译进二进制的第三方依赖的许可证全文，并随二进制嵌入，可通过 `autochangelog --license` 随时输出，保障单一可执行文件自带合规的许可证信息。
+`third_party/NOTICE.txt` 收录了所有编译进二进制的第三方依赖的许可证全文与版权声明，并随二进制嵌入，可通过 `autochangelog --license` 随时输出，保障单一可执行文件自带合规的许可证信息。
 
 依赖升级后重新生成：
 
 ```shell
-go run github.com/google/go-licenses@latest report ./... \
-  --template third_party/notice.tmpl \
-  --ignore gitee.com/quant1x/autochangelog > third_party/NOTICE.txt
+go run ./tools/noticegen
 ```
+
+生成器特性：
+- 模块清单取自实际编译进二进制的包（`go list -deps ./...`），与运行产物严格一致
+- 逐模块提取许可证全文、版权声明行（LICENSE 无版权行时从源码头部兜底提取）、NOTICE 文件内容（满足 Apache-2.0 第 4(d) 条再分发要求）
 
 合规检查（无缺失/未知许可证）：
 
