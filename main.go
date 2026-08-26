@@ -81,19 +81,23 @@ func main() {
 		versionFlag = flag.Bool("version", false, "输出当前版本并退出")
 		licenseFlag = flag.Bool("license", false, "输出第三方许可证信息并退出")
 		refreshFlag = flag.Bool("refresh", false, "刷新重建：版本/tag 不变，仅重写 CHANGELOG.md")
+		// 开关默认关闭：存在未提交改动时默认拒绝发版；
+		// 显式传入 --allow-dirty 才跳过该检查（谨慎使用，仅供测试/特殊场景）
+		allowDirtyFlag = flag.Bool("allow-dirty", false, "允许在存在未提交改动时继续发版（默认关闭）")
 	)
 	exeName := os.Args[0]
 	if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
 		exeName = exeName[idx+1:]
 	}
 	flag.Usage = func() {
-		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--refresh] [--version] [--license]\n", exeName)
+		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--refresh] [--version] [--license] [--allow-dirty]\n", exeName)
 		fmt.Printf("  --major   主版本号+1\n")
 		fmt.Printf("  --minor   次版本号+1\n")
 		fmt.Printf("  --patch   修订版本号+1 (默认)\n")
 		fmt.Printf("  --refresh 刷新重建：版本/tag 不变，仅重写 CHANGELOG.md\n")
 		fmt.Printf("  --version 输出当前版本并退出\n")
 		fmt.Printf("  --license 输出第三方许可证信息并退出\n")
+		fmt.Printf("  --allow-dirty 允许在存在未提交改动时继续发版（默认关闭，谨慎使用）\n")
 	}
 	flag.Parse()
 	if *licenseFlag {
@@ -125,7 +129,8 @@ func main() {
 	// 检查工作区是否干净：存在未提交改动时，生成结果可能不准确，直接提示退出。
 	// 用系统 git 判断，避免 go-git 对 CRLF/autocrlf 文件（如 change 脚本）的换行误报。
 	// --refresh 刷新重建模式除外：不创建任何提交，仅重写 CHANGELOG.md，允许脏工作区。
-	if !*refreshFlag {
+	// --allow-dirty 显式跳过该检查（默认关闭，仅供测试/特殊场景谨慎使用）。
+	if !*refreshFlag && !*allowDirtyFlag {
 		statusCmd := exec.Command("git", "status", "--porcelain")
 		statusCmd.Dir = currentPath
 		statusOut, statusErr := statusCmd.Output()
