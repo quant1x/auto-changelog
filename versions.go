@@ -34,6 +34,11 @@ func fixVersion(tag string) string {
 	return version
 }
 
+// tagName 返回带 v 前缀的 tag 名
+func tagName(version string) string {
+	return "v" + version
+}
+
 // parseVersion 将版本号字符串转换为int切片
 func parseVersion(v string) []int {
 	parts := strings.Split(v, ".")

@@ -20,6 +20,10 @@ import (
 const (
 	changeLogFilename   = "CHANGELOG.md"
 	defaultFirstVersion = "0.0.0"
+
+	// release 相关消息模板，统一收敛于此，修改格式只动这里
+	releaseCommitMessageTmpl = "release version %s" // 自动 release commit 的消息
+	releaseTagMessageTmpl    = "Release version %s" // 新 tag 的消息
 )
 
 func fatal(err error) {
@@ -291,10 +295,10 @@ func main() {
 	})
 	// --refresh 模式不构造新版本段，allVersions 仅包含已发布版本段，latest 保持当前最新 tag
 	newVersion := latest
-	tag := fmt.Sprintf("v%s", newVersion)
+	tag := tagName(newVersion)
 	if !*refreshFlag {
 		newVersion = incrVersion(latest, verKind)
-		tag = fmt.Sprintf("v%s", newVersion)
+		tag = tagName(newVersion)
 		now := time.Now()
 		version := TagCommits{
 			Tag:      tag,
@@ -316,7 +320,7 @@ func main() {
 		// 本次生成将创建的 release commit 尚未存在于 allCommits 中，
 		// 手动追加到新版本段，使 CHANGELOG 最新版本段包含 release 记录
 		version.Commits = append(version.Commits, Commit{
-			Message: fmt.Sprintf("release v%s", newVersion),
+			Message: fmt.Sprintf(releaseCommitMessageTmpl, newVersion),
 		})
 		allVersions = slices.Insert(allVersions, 0, version)
 	}
@@ -375,7 +379,7 @@ func main() {
 			}
 		}
 		lastSignature.When = time.Now()
-		commitHash, err := worktree.Commit(fmt.Sprintf("release version %s", newVersion), &git.CommitOptions{
+		commitHash, err := worktree.Commit(fmt.Sprintf(releaseCommitMessageTmpl, newVersion), &git.CommitOptions{
 			Author:    &lastSignature,
 			Committer: &lastSignature,
 		})
@@ -397,7 +401,7 @@ func main() {
 			os.Exit(1)
 		}
 		// 新tag
-		tagMessage := fmt.Sprintf("Release version %s", newVersion)
+		tagMessage := fmt.Sprintf(releaseTagMessageTmpl, newVersion)
 		_, err = r.CreateTag(tag, head.Hash(), &git.CreateTagOptions{
 			Message: tagMessage,
 		})
