@@ -71,12 +71,12 @@ func gitDescribeVersion() string {
 
 func main() {
 	var (
-		majorFlag  = flag.Bool("major", false, "主版本号+1")
-		minorFlag  = flag.Bool("minor", false, "次版本号+1")
-		patchFlag  = flag.Bool("patch", false, "修订版本号+1 (默认)")
+		majorFlag   = flag.Bool("major", false, "主版本号+1")
+		minorFlag   = flag.Bool("minor", false, "次版本号+1")
+		patchFlag   = flag.Bool("patch", false, "修订版本号+1 (默认)")
 		versionFlag = flag.Bool("version", false, "输出当前版本并退出")
 		licenseFlag = flag.Bool("license", false, "输出第三方许可证信息并退出")
-		refreshFlag    = flag.Bool("refresh", false, "刷新重建：版本/tag 不变，仅重写 CHANGELOG.md")
+		refreshFlag = flag.Bool("refresh", false, "刷新重建：版本/tag 不变，仅重写 CHANGELOG.md")
 	)
 	exeName := os.Args[0]
 	if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
@@ -375,7 +375,7 @@ func main() {
 			}
 		}
 		lastSignature.When = time.Now()
-		commitHash, err := worktree.Commit(fmt.Sprintf("release v%s", newVersion), &git.CommitOptions{
+		commitHash, err := worktree.Commit(fmt.Sprintf("release version %s", newVersion), &git.CommitOptions{
 			Author:    &lastSignature,
 			Committer: &lastSignature,
 		})
