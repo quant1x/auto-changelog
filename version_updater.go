@@ -28,7 +28,8 @@ type VersionUpdater interface {
 }
 
 // runVersionUpdate 版本更新调度入口：
-// 遍历注册的更新器，命中第一个 Supported() 的实现执行 Update()，并将变更文件加入暂存区。
+// 遍历注册的更新器，逐个执行所有 Supported() 的实现（同一仓库可能同时存在多个
+// 构建系统的清单文件，如 Rust + Maven），并将各更新器的变更文件加入暂存区。
 // 新增语言支持时，只需实现 VersionUpdater 接口并加入 updaters 列表。
 func runVersionUpdate(updaters []VersionUpdater, newVersion string, worktree *git.Worktree) error {
 	for _, updater := range updaters {
@@ -57,7 +58,6 @@ func runVersionUpdate(updaters []VersionUpdater, newVersion string, worktree *gi
 			}
 			fmt.Printf("staged %s\n", file)
 		}
-		return nil
 	}
 	return nil
 }
