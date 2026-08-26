@@ -187,3 +187,56 @@ func TestRunVersionUpdateEndToEnd(t *testing.T) {
 		t.Fatalf("外部 parent 版本 3.2.0 不应被改动:\n%s", content)
 	}
 }
+
+// 回归：未跟踪的清单文件（如临时放置的测试样本 pom.xml）不属于本项目，
+// 版本内容应被更新（测试可见），但不得被暂存/进入 release 提交。
+func TestRunVersionUpdateSkipUntrackedManifest(t *testing.T) {
+	dir := t.TempDir()
+	repo, err := git.PlainInit(dir, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wt, err := repo.Worktree()
+	if err != nil {
+		t.Fatal(err)
+	}
+	pomPath := filepath.Join(dir, "pom.xml")
+	if err := os.WriteFile(pomPath, []byte(realWorldPom), 0644); err != nil {
+		t.Fatal(err)
+	}
+	// 注意：不执行 wt.Add("pom.xml")，保持其为未跟踪文件
+
+	oldWD, _ := os.Getwd()
+	os.Chdir(dir)
+	defer os.Chdir(oldWD)
+
+	if err := runVersionUpdate([]VersionUpdater{
+		NewCargoUpdater(dir),
+		NewMavenUpdater(dir),
+	}, "1.1.0", wt); err != nil {
+		t.Fatal(err)
+	}
+
+	// 1. 内容已更新（测试可观察到版本变化）
+	after, err := os.ReadFile(pomPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(after), "<version>1.1.0</version>") {
+		t.Fatalf("未跟踪 pom.xml 应更新版本内容:\n%s", string(after))
+	}
+
+	// 2. 未被暂存（Staging 状态仍为 Untracked，而非 Added）
+	st, err := wt.Status()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fs := st.File("pom.xml")
+	if fs == nil {
+		t.Fatal("pom.xml 应出现在工作区状态中")
+	}
+	if fs.Staging == git.Added {
+		t.Fatalf("未跟踪 pom.xml 不应被暂存，当前 Staging=%v", fs.Staging)
+	}
+	t.Logf("PASS: untracked pom.xml updated in worktree but not staged (Staging=%v, Worktree=%v)", fs.Staging, fs.Worktree)
+}

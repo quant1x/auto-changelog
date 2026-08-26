@@ -39,7 +39,19 @@ func runVersionUpdate(updaters []VersionUpdater, newVersion string, worktree *gi
 		if err != nil {
 			return err
 		}
+		// 只暂存已被 git 跟踪的清单文件：
+		// 未跟踪文件（如临时放置的测试样本 pom.xml）不属于本项目，仅更新其内容、
+		// 不纳入 release 提交，避免污染仓库历史；真实项目的清单文件已在版本控制中，行为不变。
+		st, err := worktree.Status()
+		if err != nil {
+			return err
+		}
 		for _, file := range files {
+			fs := st.File(file)
+			if fs == nil || fs.Worktree == git.Untracked {
+				fmt.Printf("skipped staging untracked %s (not tracked by git)\n", file)
+				continue
+			}
 			if _, err := worktree.Add(file); err != nil {
 				return err
 			}
