@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.19] - 2026-08-26
+### Changed
+- 添加 --allow-dirty 开关：允许在存在未提交改动时继续发版（默认关闭）
+- release version 1.4.19
+
 ## [1.4.18] - 2026-08-26
 ### Changed
 - 修复 Maven pom.xml 版本更新失效：跨行 project 标签无法识别
@@ -545,7 +550,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.18...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.19...HEAD
+[1.4.19]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.18...v1.4.19
 [1.4.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.17...v1.4.18
 [1.4.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.16...v1.4.17
 [1.4.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.15...v1.4.16
