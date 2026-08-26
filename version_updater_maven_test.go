@@ -122,6 +122,64 @@ func TestUpdatePomProjectVersion(t *testing.T) {
 `,
 			wantUpdate: true,
 		},
+		// 用户实际项目（org.quant1x/quant1x）：跨行 <project> + 直属 <version>1.0-SNAPSHOT，
+		// 且 dependency/plugin 中也有同名 <version>，应只改 project 直属那个
+		"org-quant1x-real-pom": {
+			content: `<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.quant1x</groupId>
+    <artifactId>quant1x</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+`,
+			wantUpdate: true,
+		},
+		// 写法不敏感：<version> 值带前后空白
+		"version-value-with-spaces": {
+			content: `<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>demo</artifactId>
+    <version> 1.0.0 </version>
+</project>
+`,
+			wantUpdate: true,
+		},
+		// 写法不敏感：<version> 值跨行
+		"version-value-multiline": {
+			content: `<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>demo</artifactId>
+    <version>
+        1.0.0
+    </version>
+</project>
+`,
+			wantUpdate: true,
+		},
 	}
 	for name, c := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -141,6 +199,80 @@ func TestUpdatePomProjectVersion(t *testing.T) {
 				t.Fatalf("modified=%v, want %v", modified, c.wantUpdate)
 			}
 		})
+	}
+}
+
+// 语义化路径验证：只改 <project> 直属 <version>，
+// <parent>/<dependency>/<plugin>/<properties> 等位置的同名 version 一律不动。
+func TestUpdatePomProjectVersionOnlyProjectDirect(t *testing.T) {
+	const pom = `<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.0</version>
+    </parent>
+    <groupId>org.quant1x</groupId>
+    <artifactId>quant1x</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <junit.jupiter.version>5.8.2</junit.jupiter.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+`
+	dir := t.TempDir()
+	pomPath := filepath.Join(dir, "pom.xml")
+	if err := os.WriteFile(pomPath, []byte(pom), 0644); err != nil {
+		t.Fatal(err)
+	}
+	oldWD, _ := os.Getwd()
+	os.Chdir(dir)
+	defer os.Chdir(oldWD)
+
+	modified, err := updatePomProjectVersion(pomXmlFilename, "1.4.20")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !modified {
+		t.Fatal("应更新 project 直属 version")
+	}
+	after, err := os.ReadFile(pomPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	content := string(after)
+	if !strings.Contains(content, "<version>1.4.20</version>") {
+		t.Fatalf("project 直属 version 未更新:\n%s", content)
+	}
+	if !strings.Contains(content, "<version>3.2.0</version>") {
+		t.Fatalf("parent version 不应被改动:\n%s", content)
+	}
+	if !strings.Contains(content, "<version>${junit.jupiter.version}</version>") {
+		t.Fatalf("dependency version 不应被改动:\n%s", content)
+	}
+	if !strings.Contains(content, "<junit.jupiter.version>5.8.2</junit.jupiter.version>") {
+		t.Fatalf("properties 中的版本定义不应被改动:\n%s", content)
+	}
+	if !strings.Contains(content, "<version>3.2.5</version>") {
+		t.Fatalf("plugin version 不应被改动:\n%s", content)
 	}
 }
 

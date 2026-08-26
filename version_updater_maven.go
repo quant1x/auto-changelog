@@ -2,147 +2,25 @@ package main
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
-	"regexp"
+	"slices"
+	"strings"
 )
 
 const pomXmlFilename = "pom.xml"
-
-// 预编译正则，避免每次调用都编译
-var (
-	// 匹配独立的 <version>...</version> 行，保留缩进与标签
-	pomVersionRe = regexp.MustCompile(`^(\s*<version>)([^<]*)(</version>\s*)$`)
-	// 匹配独立的 <module>xxx</module> 行（聚合 pom 的子模块声明）
-	pomModuleRe = regexp.MustCompile(`^\s*<module>([^<]*)</module>\s*$`)
-	// 匹配独立的 <groupId>xxx</groupId> / <artifactId>xxx</artifactId> 行
-	pomGroupIdRe    = regexp.MustCompile(`^\s*<groupId>([^<]*)</groupId>\s*$`)
-	pomArtifactIdRe = regexp.MustCompile(`^\s*<artifactId>([^<]*)</artifactId>\s*$`)
-)
-
-// pomTag XML 标签事件
-type pomTag struct {
-	name        string
-	closing     bool
-	selfClosing bool
-}
-
-// xmlScanner 流式 XML 标签扫描器：
-// 逐行喂入（feed），跨行累积标签内容（如 <project> 多行属性），
-// 跳过 <?xml 声明、<!-- 注释、<!DOCTYPE，正确处理标签属性值内的引号。
-type xmlScanner struct {
-	inTag     bool   // 正在累积标签内容
-	inQuote   byte   // 标签属性值引号（" 或 '），0 表示不在引号内
-	inComment bool   // 处于 <!-- ... --> 注释中
-	inDecl    bool   // 处于 <?...?> 或 <!...> 声明中
-	buf       []byte // 累积中的标签内容（不含 < 与 >）
-}
-
-// feed 处理一行输入，返回该行解析出的全部完整标签事件。
-func (s *xmlScanner) feed(line []byte) []pomTag {
-	var tags []pomTag
-	i, n := 0, len(line)
-	for i < n {
-		b := line[i]
-		switch {
-		case s.inComment:
-			if idx := bytes.Index(line[i:], []byte("-->")); idx >= 0 {
-				i += idx + 3
-				s.inComment = false
-			} else {
-				i = n // 注释跨行，本行剩余忽略
-			}
-		case s.inDecl:
-			if idx := bytes.IndexByte(line[i:], '>'); idx >= 0 {
-				i += idx + 1
-				s.inDecl = false
-			} else {
-				i = n
-			}
-		case s.inTag:
-			if s.inQuote != 0 {
-				if b == s.inQuote {
-					s.inQuote = 0
-				}
-				s.buf = append(s.buf, b)
-				i++
-			} else if b == '"' || b == '\'' {
-				s.inQuote = b
-				s.buf = append(s.buf, b)
-				i++
-			} else if b == '>' {
-				if tg := parseTag(s.buf); tg != nil {
-					tags = append(tags, *tg)
-				}
-				s.buf = s.buf[:0]
-				s.inTag = false
-				i++
-			} else {
-				s.buf = append(s.buf, b)
-				i++
-			}
-		default:
-			if b == '<' {
-				rest := line[i:]
-				switch {
-				case bytes.HasPrefix(rest, []byte("<!--")):
-					s.inComment = true
-					i += 4
-				case bytes.HasPrefix(rest, []byte("<?")):
-					s.inDecl = true
-					i += 2
-				case bytes.HasPrefix(rest, []byte("<!")):
-					s.inDecl = true
-					i += 2
-				default:
-					s.inTag = true
-					s.buf = s.buf[:0]
-					i++
-				}
-			} else {
-				i++
-			}
-		}
-	}
-	return tags
-}
-
-// parseTag 解析累积的标签内容（不含 < 与 >），返回标签事件；无法解析时返回 nil。
-func parseTag(buf []byte) *pomTag {
-	if len(buf) == 0 {
-		return nil
-	}
-	closing := buf[0] == '/'
-	if closing {
-		buf = buf[1:]
-	}
-	buf = bytes.TrimLeft(buf, " \t\r\n")
-	if len(buf) == 0 {
-		return nil
-	}
-	end := 0
-	for end < len(buf) {
-		c := buf[end]
-		if c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '/' {
-			break
-		}
-		end++
-	}
-	if end == 0 {
-		return nil
-	}
-	return &pomTag{
-		name:        string(buf[:end]),
-		closing:     closing,
-		selfClosing: bytes.HasSuffix(bytes.TrimRight(buf, " \t\r\n"), []byte("/")),
-	}
-}
 
 // MavenUpdater 针对 Java/Maven 项目的版本更新实现。
 // 支持聚合（multi-module）项目：根 pom 更新自身版本，并级联同步各子模块 <parent> 版本。
 // 模块路径严格按 pom 中 <modules> 声明的相对路径解析（相对各自 pom 所在目录），
 // 聚合可以嵌套（子模块自身也是聚合 pom），递归遍历，不假设代码位于 src 等固定目录。
+//
+// 版本更新采用 encoding/xml 语义解析：直接取 <project><version> 路径替换值文本，
+// 不依赖 pom.xml 的具体写法（标签单行/跨行、注释、缩进、属性顺序、版本值换行等），
+// 且只改动 <version> 元素的值部分，文件其余字节原样保留。
 //
 // 调用链：
 //
@@ -233,30 +111,36 @@ func collectModulePoms(rootPom string) []mavenModule {
 }
 
 // pomModules 返回 pom 声明的子模块目录列表。
-// 用栈追踪层级，只识别 <project><modules> 直属的 <module>，
-// 避免误抓 <profile> 等条件区域中的 <modules>。模块路径相对当前 pom 所在目录。
+// 语义化解析：只取 <project><modules> 直属 <module> 的文本值，
+// 自动排除 <profile> 等条件区域中的 <modules>，不依赖 <module> 的单行写法。
 func pomModules(filePath string) []string {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil
 	}
-	var mods []string
+	dec := xml.NewDecoder(bytes.NewReader(content))
 	var stack []string
-	scanner := &xmlScanner{}
-	for _, line := range bytes.Split(content, []byte("\n")) {
-		trimmed := string(bytes.TrimSpace(line))
-		for _, tg := range scanner.feed(line) {
-			if !tg.closing && !tg.selfClosing {
-				if tg.name == "module" && len(stack) == 2 &&
-					stack[0] == "project" && stack[1] == "modules" {
-					if m := pomModuleRe.FindStringSubmatch(trimmed); m != nil {
-						mods = append(mods, m[1])
-					}
-				}
-				stack = append(stack, tg.name)
-			} else if tg.closing {
-				if len(stack) > 0 && stack[len(stack)-1] == tg.name {
-					stack = stack[:len(stack)-1]
+	var mods []string
+	for {
+		tok, err := dec.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			stack = append(stack, t.Name.Local)
+		case xml.EndElement:
+			if len(stack) > 0 {
+				stack = stack[:len(stack)-1]
+			}
+		case xml.CharData:
+			if len(stack) == 3 && stack[0] == "project" &&
+				stack[1] == "modules" && stack[2] == "module" {
+				if v := strings.TrimSpace(string(t)); v != "" {
+					mods = append(mods, v)
 				}
 			}
 		}
@@ -278,123 +162,157 @@ func pomGAV(filePath string) string {
 
 // extractGAV 提取 pom 中的 groupId/artifactId。
 // inParent=true 时取 <project><parent> 内的值；否则取 <project> 直属值。
+// 语义化解析：取目标元素路径下的 <groupId>/<artifactId> 文本值，不依赖单行写法。
 func extractGAV(filePath string, inParent bool) (g, a string) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", ""
 	}
+	dec := xml.NewDecoder(bytes.NewReader(content))
 	var stack []string
-	scanner := &xmlScanner{}
-	for _, line := range bytes.Split(content, []byte("\n")) {
-		trimmed := string(bytes.TrimSpace(line))
-		for _, tg := range scanner.feed(line) {
-			if tg.closing || tg.selfClosing {
-				if tg.closing && len(stack) > 0 && stack[len(stack)-1] == tg.name {
-					stack = stack[:len(stack)-1]
-				}
+	cur := "" // 当前打开的叶子元素名（用于关联其 CharData）
+	for {
+		tok, err := dec.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", ""
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			cur = t.Name.Local
+			stack = append(stack, t.Name.Local)
+		case xml.EndElement:
+			if len(stack) > 0 {
+				stack = stack[:len(stack)-1]
+			}
+			cur = ""
+		case xml.CharData:
+			v := strings.TrimSpace(string(t))
+			if v == "" || cur == "" {
 				continue
 			}
-			depth := len(stack)
 			if inParent {
-				if depth == 2 && stack[0] == "project" && stack[1] == "parent" {
-					switch tg.name {
+				if len(stack) == 3 && stack[0] == "project" &&
+					stack[1] == "parent" && stack[2] == cur {
+					switch cur {
 					case "groupId":
-						if m := pomGroupIdRe.FindStringSubmatch(trimmed); m != nil {
-							g = m[1]
-						}
+						g = v
 					case "artifactId":
-						if m := pomArtifactIdRe.FindStringSubmatch(trimmed); m != nil {
-							a = m[1]
-						}
+						a = v
 					}
 				}
 			} else {
-				if depth == 1 && stack[0] == "project" {
-					switch tg.name {
+				if len(stack) == 2 && stack[0] == "project" && stack[1] == cur {
+					switch cur {
 					case "groupId":
-						if m := pomGroupIdRe.FindStringSubmatch(trimmed); m != nil {
-							g = m[1]
-						}
+						g = v
 					case "artifactId":
-						if m := pomArtifactIdRe.FindStringSubmatch(trimmed); m != nil {
-							a = m[1]
-						}
+						a = v
 					}
 				}
 			}
-			stack = append(stack, tg.name)
 		}
 	}
 	return g, a
 }
 
-// updatePomProjectVersion 更新 pom.xml 中 project 直属的 <version>（聚合根/单模块场景）。
-// 跳过 <parent>/<dependency>/<plugin> 等嵌套元素的版本号。
+// xmlVersionEdit 记录一处 <version> 元素的值文本字节范围（含值内空白，整体替换）。
+type xmlVersionEdit struct {
+	start, end int
+}
+
+// versionEdits 语义化定位 XML 内容中所有"父路径匹配 paths 的 <version> 元素"的值文本范围。
+// 用 encoding/xml 事件流 + InputOffset 精确计算字节位置：
+//   - 不依赖 <version> 的单行/跨行写法，值内换行、注释、空白均正确处理
+//   - 只匹配给定父路径下的 version（如 ["project"] 或 ["project","parent"]），
+//     自动排除 <dependency>/<plugin>/<properties> 等嵌套位置的同名元素
+func versionEdits(content []byte, paths [][]string) ([]xmlVersionEdit, error) {
+	dec := xml.NewDecoder(bytes.NewReader(content))
+	var stack []string
+	var edits []xmlVersionEdit
+	var cur *xmlVersionEdit // 当前打开的待更新 <version> 元素
+	for {
+		tokStart := dec.InputOffset()
+		tok, err := dec.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		tokEnd := dec.InputOffset()
+		switch t := tok.(type) {
+		case xml.StartElement:
+			if t.Name.Local == "version" && matchesStack(stack, paths) {
+				cur = &xmlVersionEdit{start: -1, end: -1}
+			}
+			stack = append(stack, t.Name.Local)
+		case xml.EndElement:
+			if len(stack) > 0 && stack[len(stack)-1] == t.Name.Local {
+				if t.Name.Local == "version" && cur != nil {
+					if cur.end > cur.start {
+						edits = append(edits, *cur)
+					}
+					cur = nil
+				}
+				stack = stack[:len(stack)-1]
+			}
+		case xml.CharData:
+			if cur != nil {
+				if cur.start < 0 {
+					cur.start = int(tokStart)
+				}
+				cur.end = int(tokEnd)
+			}
+		}
+	}
+	return edits, nil
+}
+
+// matchesStack 判断当前元素栈是否命中任一目标父路径。
+func matchesStack(stack []string, paths [][]string) bool {
+	for _, p := range paths {
+		if slices.Equal(stack, p) {
+			return true
+		}
+	}
+	return false
+}
+
+// applyEdits 从后往前将各版本值文本替换为新版本，保留文件其余字节原样。
+func applyEdits(content []byte, edits []xmlVersionEdit, newVersion string) []byte {
+	out := append([]byte(nil), content...)
+	for i := len(edits) - 1; i >= 0; i-- {
+		e := edits[i]
+		out = append(out[:e.start], append([]byte(newVersion), out[e.end:]...)...)
+	}
+	return out
+}
+
+// updatePomProjectVersion 更新 pom.xml 中 <project> 直属 <version>（聚合根/单模块场景）。
+// 语义化解析取 <project><version> 路径，跳过 <parent>/<dependency>/<plugin> 等嵌套元素的版本号。
 func updatePomProjectVersion(filePath, newVersion string) (bool, error) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return false, err
 	}
-
-	// 1. 检测原始文件的换行符，防止跨平台换行符被篡改
-	eol := "\n"
-	if bytes.Contains(content, []byte("\r\n")) {
-		eol = "\r\n"
+	edits, err := versionEdits(content, [][]string{{"project"}})
+	if err != nil {
+		return false, err
 	}
-
-	// 2. 按行分割，保留空行
-	lines := bytes.Split(content, []byte(eol))
-
-	// 3. 逐行解析 XML 标签，用栈跟踪当前元素层级
-	//    仅当 <version> 出现在 <project> 直属层级（栈 == [project]）时才替换
-	var stack []string
-	inProject := false
-	updated := false
-	scanner := &xmlScanner{}
-
-	for i, line := range lines {
-		replaceVersion := false
-		for _, tg := range scanner.feed(line) {
-			if !tg.closing && !tg.selfClosing {
-				if tg.name == "project" {
-					inProject = true
-				}
-				// project 直属的 <version>（进入该标签前的栈只有 project）
-				if tg.name == "version" && inProject && len(stack) == 1 {
-					replaceVersion = true
-				}
-				stack = append(stack, tg.name)
-			} else if tg.closing {
-				if len(stack) > 0 && stack[len(stack)-1] == tg.name {
-					stack = stack[:len(stack)-1]
-				}
-				if tg.name == "project" {
-					inProject = false
-				}
-			}
-		}
-
-		// 4. 替换 project 自身版本（保留缩进与标签）
-		if replaceVersion {
-			lines[i] = pomVersionRe.ReplaceAll(line, fmt.Appendf(nil, `${1}%s${3}`, newVersion))
-			updated = true
-		}
-	}
-
-	if !updated {
+	if len(edits) == 0 {
 		return false, nil
 	}
-
-	// 5. 使用原始换行符重新拼接
-	newContent := bytes.Join(lines, []byte(eol))
-	return true, os.WriteFile(filePath, newContent, 0644)
+	return true, os.WriteFile(filePath, applyEdits(content, edits, newVersion), 0644)
 }
 
 // updateModulePomVersion 更新子模块 pom：
 //   - <parent> 的 GAV 与 parentGAV（直接父 pom 的 GAV）匹配时，更新其 <version>
 //   - 子模块自身显式声明的 project 直属 <version> 也更新为 newVersion
 func updateModulePomVersion(filePath, newVersion, parentGAV string) (bool, error) {
-	// 第一遍：提取子模块 <parent> 的 GAV，判断是否指向直接父 pom
+	// 提取子模块 <parent> 的 GAV，判断是否指向直接父 pom
 	updateParent := false
 	if g, a := extractGAV(filePath, true); g != "" && a != "" {
 		updateParent = g+":"+a == parentGAV
@@ -404,55 +322,16 @@ func updateModulePomVersion(filePath, newVersion, parentGAV string) (bool, error
 	if err != nil {
 		return false, err
 	}
-	eol := "\n"
-	if bytes.Contains(content, []byte("\r\n")) {
-		eol = "\r\n"
+	paths := [][]string{{"project"}}
+	if updateParent {
+		paths = append(paths, []string{"project", "parent"})
 	}
-	lines := bytes.Split(content, []byte(eol))
-
-	// 第二遍：更新 version
-	var stack []string
-	inProject := false
-	updated := false
-	scanner := &xmlScanner{}
-
-	for i, line := range lines {
-		replaceVersion := false
-		for _, tg := range scanner.feed(line) {
-			if !tg.closing && !tg.selfClosing {
-				if tg.name == "project" {
-					inProject = true
-				}
-				// project 直属 <version>
-				if tg.name == "version" && inProject && len(stack) == 1 {
-					replaceVersion = true
-				}
-				// <parent> 内的 <version>（仅当 parent 指向直接父 pom）
-				if tg.name == "version" && updateParent && len(stack) == 2 &&
-					stack[0] == "project" && stack[1] == "parent" {
-					replaceVersion = true
-				}
-				stack = append(stack, tg.name)
-			} else if tg.closing {
-				if len(stack) > 0 && stack[len(stack)-1] == tg.name {
-					stack = stack[:len(stack)-1]
-				}
-				if tg.name == "project" {
-					inProject = false
-				}
-			}
-		}
-
-		if replaceVersion {
-			lines[i] = pomVersionRe.ReplaceAll(line, fmt.Appendf(nil, `${1}%s${3}`, newVersion))
-			updated = true
-		}
+	edits, err := versionEdits(content, paths)
+	if err != nil {
+		return false, err
 	}
-
-	if !updated {
+	if len(edits) == 0 {
 		return false, nil
 	}
-
-	newContent := bytes.Join(lines, []byte(eol))
-	return true, os.WriteFile(filePath, newContent, 0644)
+	return true, os.WriteFile(filePath, applyEdits(content, edits, newVersion), 0644)
 }
