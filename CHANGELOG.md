@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.18] - 2026-08-26
+### Changed
+- 修复 Maven pom.xml 版本更新失效：跨行 project 标签无法识别
+
+将按行正则解析改为流式跨行 XML 标签扫描器，正确处理跨行标签、
+属性值引号、多行注释与 XML 声明，避免真实项目 pom 中多行
+<project> 标签导致版本更新静默失效。新增对应回归测试。
+- release version 1.4.18
+
 ## [1.4.17] - 2026-08-26
 ### Changed
 - 收敛 release 版本消息模板与 tag 名拼接，消除重复代码
@@ -536,7 +545,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.17...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.18...HEAD
+[1.4.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.17...v1.4.18
 [1.4.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.16...v1.4.17
 [1.4.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.15...v1.4.16
 [1.4.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.14...v1.4.15
