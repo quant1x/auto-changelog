@@ -76,16 +76,18 @@ func main() {
 		patchFlag  = flag.Bool("patch", false, "修订版本号+1 (默认)")
 		versionFlag = flag.Bool("version", false, "输出当前版本并退出")
 		licenseFlag = flag.Bool("license", false, "输出第三方许可证信息并退出")
+		refreshFlag    = flag.Bool("refresh", false, "刷新重建：版本/tag 不变，仅重写 CHANGELOG.md")
 	)
 	exeName := os.Args[0]
 	if idx := strings.LastIndex(exeName, string(os.PathSeparator)); idx >= 0 {
 		exeName = exeName[idx+1:]
 	}
 	flag.Usage = func() {
-		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--version] [--license]\n", exeName)
+		fmt.Printf("Usage: %s [--major] [--minor] [--patch] [--refresh] [--version] [--license]\n", exeName)
 		fmt.Printf("  --major   主版本号+1\n")
 		fmt.Printf("  --minor   次版本号+1\n")
 		fmt.Printf("  --patch   修订版本号+1 (默认)\n")
+		fmt.Printf("  --refresh 刷新重建：版本/tag 不变，仅重写 CHANGELOG.md\n")
 		fmt.Printf("  --version 输出当前版本并退出\n")
 		fmt.Printf("  --license 输出第三方许可证信息并退出\n")
 	}
@@ -117,16 +119,19 @@ func main() {
 		fatal(err)
 	}
 	// 检查工作区是否干净：存在未提交改动时，生成结果可能不准确，直接提示退出。
-	// 用系统 git 判断，避免 go-git 对 CRLF/autocrlf 文件（如 change 脚本）的换行误报
-	statusCmd := exec.Command("git", "status", "--porcelain")
-	statusCmd.Dir = currentPath
-	statusOut, statusErr := statusCmd.Output()
-	if statusErr != nil {
-		fatal(statusErr)
-	}
-	if len(strings.TrimSpace(string(statusOut))) > 0 {
-		fmt.Fprintln(os.Stderr, "working tree has uncommitted change(s); commit or stash them first")
-		os.Exit(1)
+	// 用系统 git 判断，避免 go-git 对 CRLF/autocrlf 文件（如 change 脚本）的换行误报。
+	// --refresh 刷新重建模式除外：不创建任何提交，仅重写 CHANGELOG.md，允许脏工作区。
+	if !*refreshFlag {
+		statusCmd := exec.Command("git", "status", "--porcelain")
+		statusCmd.Dir = currentPath
+		statusOut, statusErr := statusCmd.Output()
+		if statusErr != nil {
+			fatal(statusErr)
+		}
+		if len(strings.TrimSpace(string(statusOut))) > 0 {
+			fmt.Fprintln(os.Stderr, "working tree has uncommitted change(s); commit or stash them first")
+			os.Exit(1)
+		}
 	}
 	worktree, err := r.Worktree()
 	if err != nil {
@@ -223,8 +228,9 @@ func main() {
 			tags = append(tags, tagInfos...)
 		}
 	}
-	// 当前最新 commit 上已有 tag，说明该提交已发布过，无需生成新版本
-	if tagInfos, ok := tagsByCommit[newestCommitId]; ok {
+	// 当前最新 commit 上已有 tag，说明该提交已发布过，无需生成新版本；
+	// --refresh 刷新重建模式除外：版本/tag 不变，仅重写 CHANGELOG.md
+	if tagInfos, ok := tagsByCommit[newestCommitId]; ok && !*refreshFlag {
 		names := make([]string, 0, len(tagInfos))
 		for _, tagInfo := range tagInfos {
 			names = append(names, tagInfo.Name)
@@ -283,32 +289,37 @@ func main() {
 	slices.SortFunc(allVersions, func(a, b TagCommits) int {
 		return -1 * cmpVersion(a.Version, b.Version)
 	})
-	newVersion := incrVersion(latest, verKind)
+	// --refresh 模式不构造新版本段，allVersions 仅包含已发布版本段，latest 保持当前最新 tag
+	newVersion := latest
 	tag := fmt.Sprintf("v%s", newVersion)
-	now := time.Now()
-	version := TagCommits{
-		Tag:      tag,
-		Version:  newVersion,
-		Previous: previousVersion,
-		Date:     now.Format(time.DateOnly),
-		//RepositoryURL: repositoryURL,
-		Oldest: oldest,
+	if !*refreshFlag {
+		newVersion = incrVersion(latest, verKind)
+		tag = fmt.Sprintf("v%s", newVersion)
+		now := time.Now()
+		version := TagCommits{
+			Tag:      tag,
+			Version:  newVersion,
+			Previous: previousVersion,
+			Date:     now.Format(time.DateOnly),
+			//RepositoryURL: repositoryURL,
+			Oldest: oldest,
+		}
+		latest = newVersion
+		version.Time = now
+		version.Commits = Filter(allCommits, func(commit Commit) bool {
+			commitTime := commit.Time
+			inRange := commitTime.After(lastTagTime) && !commitTime.After(version.Time)
+			//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
+			//return inRange && c2
+			return inRange
+		})
+		// 本次生成将创建的 release commit 尚未存在于 allCommits 中，
+		// 手动追加到新版本段，使 CHANGELOG 最新版本段包含 release 记录
+		version.Commits = append(version.Commits, Commit{
+			Message: fmt.Sprintf("release v%s", newVersion),
+		})
+		allVersions = slices.Insert(allVersions, 0, version)
 	}
-	latest = newVersion
-	version.Time = now
-	version.Commits = Filter(allCommits, func(commit Commit) bool {
-		commitTime := commit.Time
-		inRange := commitTime.After(lastTagTime) && !commitTime.After(version.Time)
-		//c2 := strings.TrimSpace(commit.Message) != strings.TrimSpace(commitUpdateChangeLog)
-		//return inRange && c2
-		return inRange
-	})
-	// 本次生成将创建的 release commit 尚未存在于 allCommits 中，
-	// 手动追加到新版本段，使 CHANGELOG 最新版本段包含 release 记录
-	version.Commits = append(version.Commits, Commit{
-		Message: fmt.Sprintf("release v%s", newVersion),
-	})
-	allVersions = slices.Insert(allVersions, 0, version)
 	//os.Exit(0)
 	// 更新ChangeLog
 	tmpl, err := template.New("ChangeLog").Parse(templateChangeLog)
@@ -342,54 +353,61 @@ func main() {
 		fatal(err)
 	}
 	// 同步更新项目清单文件版本（版本更新调度，调用链见 version_updater.go）
-	if err := runVersionUpdate([]VersionUpdater{
-		NewCargoUpdater(currentPath),
-		NewMavenUpdater(currentPath),
-	}, newVersion, worktree); err != nil {
-		fatal(err)
-	}
-	// Ensure we have a valid signature (fallback to last commit's author when no annotated tags exist)
-	if lastSignature.Name == "" && lastSignature.Email == "" {
-		if len(allCommits) > 0 {
-			// use the latest commit's signature as the author/committer
-			lastSignature = allCommits[len(allCommits)-1].Signature
-		} else {
-			// No commits in repository — this tool requires at least one commit
-			fmt.Fprintln(os.Stderr, "no commits found in repository; cannot create changelog")
-			os.Exit(1)
+	if !*refreshFlag {
+		if err := runVersionUpdate([]VersionUpdater{
+			NewCargoUpdater(currentPath),
+			NewMavenUpdater(currentPath),
+		}, newVersion, worktree); err != nil {
+			fatal(err)
 		}
 	}
-	lastSignature.When = time.Now()
-	commitHash, err := worktree.Commit(fmt.Sprintf("release v%s", newVersion), &git.CommitOptions{
-		Author:    &lastSignature,
-		Committer: &lastSignature,
-	})
-	if err != nil {
-		fatal(err)
+	// --refresh 模式：不创建 release commit、不打新 tag，仅重新生成 CHANGELOG.md
+	if !*refreshFlag {
+		// Ensure we have a valid signature (fallback to last commit's author when no annotated tags exist)
+		if lastSignature.Name == "" && lastSignature.Email == "" {
+			if len(allCommits) > 0 {
+				// use the latest commit's signature as the author/committer
+				lastSignature = allCommits[len(allCommits)-1].Signature
+			} else {
+				// No commits in repository — this tool requires at least one commit
+				fmt.Fprintln(os.Stderr, "no commits found in repository; cannot create changelog")
+				os.Exit(1)
+			}
+		}
+		lastSignature.When = time.Now()
+		commitHash, err := worktree.Commit(fmt.Sprintf("release v%s", newVersion), &git.CommitOptions{
+			Author:    &lastSignature,
+			Committer: &lastSignature,
+		})
+		if err != nil {
+			fatal(err)
+		}
+		createdCommit, err := r.CommitObject(commitHash)
+		if err != nil {
+			fatal(err)
+		}
+		fmt.Printf("%+v\n", createdCommit)
+		//err = r.Push(&git.PushOptions{})
+		//if err != nil {
+		//	panic(err)
+		//}
+		head, err := r.Head()
+		if err != nil {
+			fmt.Printf("get HEAD error: %s", err)
+			os.Exit(1)
+		}
+		// 新tag
+		tagMessage := fmt.Sprintf("Release version %s", newVersion)
+		_, err = r.CreateTag(tag, head.Hash(), &git.CreateTagOptions{
+			Message: tagMessage,
+		})
+		if err != nil {
+			fmt.Printf("%+v\n", err)
+		} else {
+			fmt.Printf("new tag, %s\n", tagMessage)
+			fmt.Println("Auto ChangeLog, OK.")
+		}
+		return
 	}
-	createdCommit, err := r.CommitObject(commitHash)
-	if err != nil {
-		fatal(err)
-	}
-	fmt.Printf("%+v\n", createdCommit)
-	//err = r.Push(&git.PushOptions{})
-	//if err != nil {
-	//	panic(err)
-	//}
-	head, err := r.Head()
-	if err != nil {
-		fmt.Printf("get HEAD error: %s", err)
-		os.Exit(1)
-	}
-	// 新tag
-	tagMessage := fmt.Sprintf("Release version %s", newVersion)
-	_, err = r.CreateTag(tag, head.Hash(), &git.CreateTagOptions{
-		Message: tagMessage,
-	})
-	if err != nil {
-		fmt.Printf("%+v\n", err)
-	} else {
-		fmt.Printf("new tag, %s\n", tagMessage)
-		fmt.Println("Auto ChangeLog, OK.")
-	}
+	fmt.Println("刷新完成：CHANGELOG.md 已重写（版本/tag 未变更，未创建提交），请检查修订结果后自行提交。")
 }

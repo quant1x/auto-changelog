@@ -48,8 +48,8 @@ Go 编写的 changelog 自动生成工具，从 git 历史与 tag 生成 `CHANGE
 ```powershell
 # 生成 changelog（必须用当前目录编译的新版）
 go build -o autochangelog.exe .
-.\autochangelog.exe          # 增量
-.\autochangelog.exe -full    # 全量重建
+.\autochangelog.exe          # 增量发版（自动升版本/打 tag）
+.\autochangelog.exe --refresh # 刷新重建：版本/tag 不变，仅重写 CHANGELOG.md，用于预览模板修订
 
 # 重新生成第三方许可证声明
 go run ./tools/noticegen
