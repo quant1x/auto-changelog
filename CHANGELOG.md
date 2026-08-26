@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.15] - 2026-08-26
+### Changed
+- 将 --full 参数更名为 --refresh，用于仅重写 CHANGELOG.md 预览模板修订
+- release v1.4.15
+
 ## [1.4.14] - 2026-08-26
 ### Changed
 - 恢复旧模板
@@ -521,7 +526,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.14...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.15...HEAD
+[1.4.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.14...v1.4.15
 [1.4.14]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.13...v1.4.14
 [1.4.13]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.12...v1.4.13
 [1.4.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.11...v1.4.12
