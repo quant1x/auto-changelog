@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.20] - 2026-08-26
+### Changed
+- 发版时仅暂存已跟踪的清单文件：未跟踪的 pom.xml 等测试样本只更新内容、不进入 release 提交
+- release version 1.4.20
+
 ## [1.4.19] - 2026-08-26
 ### Changed
 - 添加 --allow-dirty 开关：允许在存在未提交改动时继续发版（默认关闭）
@@ -551,7 +556,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.19...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.20...HEAD
+[1.4.20]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.19...v1.4.20
 [1.4.19]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.18...v1.4.19
 [1.4.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.17...v1.4.18
 [1.4.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.16...v1.4.17
