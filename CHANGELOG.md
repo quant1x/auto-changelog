@@ -3,10 +3,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.17] - 2026-08-26
+### Changed
+- 收敛 release 版本消息模板与 tag 名拼接，消除重复代码
+- release version 1.4.17
+
 ## [1.4.16] - 2026-08-26
 ### Changed
 - 修改发布版本的消息格式
-- release v1.4.16
+- release version 1.4.16
 
 ## [1.4.15] - 2026-08-26
 ### Changed
@@ -531,7 +536,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.16...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.17...HEAD
+[1.4.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.16...v1.4.17
 [1.4.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.15...v1.4.16
 [1.4.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.14...v1.4.15
 [1.4.14]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.13...v1.4.14
