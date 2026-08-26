@@ -6,15 +6,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strings"
 )
 
 const pomXmlFilename = "pom.xml"
 
 // 预编译正则，避免每次调用都编译
 var (
-	// 匹配 XML 标签事件：<tag ...> / </tag> / <tag .../>（自动跳过 <?xml 声明、<!-- 注释、<!DOCTYPE）
-	xmlTagRe = regexp.MustCompile(`<([/]?)([\w-]+)([^>]*)>`)
 	// 匹配独立的 <version>...</version> 行，保留缩进与标签
 	pomVersionRe = regexp.MustCompile(`^(\s*<version>)([^<]*)(</version>\s*)$`)
 	// 匹配独立的 <module>xxx</module> 行（聚合 pom 的子模块声明）
@@ -31,18 +28,115 @@ type pomTag struct {
 	selfClosing bool
 }
 
-// scanLineTags 解析一行中的全部标签事件
-func scanLineTags(line string) []pomTag {
-	ms := xmlTagRe.FindAllStringSubmatch(line, -1)
-	tags := make([]pomTag, 0, len(ms))
-	for _, m := range ms {
-		tags = append(tags, pomTag{
-			name:        m[2],
-			closing:     m[1] == "/",
-			selfClosing: strings.HasSuffix(m[3], "/"),
-		})
+// xmlScanner 流式 XML 标签扫描器：
+// 逐行喂入（feed），跨行累积标签内容（如 <project> 多行属性），
+// 跳过 <?xml 声明、<!-- 注释、<!DOCTYPE，正确处理标签属性值内的引号。
+type xmlScanner struct {
+	inTag     bool   // 正在累积标签内容
+	inQuote   byte   // 标签属性值引号（" 或 '），0 表示不在引号内
+	inComment bool   // 处于 <!-- ... --> 注释中
+	inDecl    bool   // 处于 <?...?> 或 <!...> 声明中
+	buf       []byte // 累积中的标签内容（不含 < 与 >）
+}
+
+// feed 处理一行输入，返回该行解析出的全部完整标签事件。
+func (s *xmlScanner) feed(line []byte) []pomTag {
+	var tags []pomTag
+	i, n := 0, len(line)
+	for i < n {
+		b := line[i]
+		switch {
+		case s.inComment:
+			if idx := bytes.Index(line[i:], []byte("-->")); idx >= 0 {
+				i += idx + 3
+				s.inComment = false
+			} else {
+				i = n // 注释跨行，本行剩余忽略
+			}
+		case s.inDecl:
+			if idx := bytes.IndexByte(line[i:], '>'); idx >= 0 {
+				i += idx + 1
+				s.inDecl = false
+			} else {
+				i = n
+			}
+		case s.inTag:
+			if s.inQuote != 0 {
+				if b == s.inQuote {
+					s.inQuote = 0
+				}
+				s.buf = append(s.buf, b)
+				i++
+			} else if b == '"' || b == '\'' {
+				s.inQuote = b
+				s.buf = append(s.buf, b)
+				i++
+			} else if b == '>' {
+				if tg := parseTag(s.buf); tg != nil {
+					tags = append(tags, *tg)
+				}
+				s.buf = s.buf[:0]
+				s.inTag = false
+				i++
+			} else {
+				s.buf = append(s.buf, b)
+				i++
+			}
+		default:
+			if b == '<' {
+				rest := line[i:]
+				switch {
+				case bytes.HasPrefix(rest, []byte("<!--")):
+					s.inComment = true
+					i += 4
+				case bytes.HasPrefix(rest, []byte("<?")):
+					s.inDecl = true
+					i += 2
+				case bytes.HasPrefix(rest, []byte("<!")):
+					s.inDecl = true
+					i += 2
+				default:
+					s.inTag = true
+					s.buf = s.buf[:0]
+					i++
+				}
+			} else {
+				i++
+			}
+		}
 	}
 	return tags
+}
+
+// parseTag 解析累积的标签内容（不含 < 与 >），返回标签事件；无法解析时返回 nil。
+func parseTag(buf []byte) *pomTag {
+	if len(buf) == 0 {
+		return nil
+	}
+	closing := buf[0] == '/'
+	if closing {
+		buf = buf[1:]
+	}
+	buf = bytes.TrimLeft(buf, " \t\r\n")
+	if len(buf) == 0 {
+		return nil
+	}
+	end := 0
+	for end < len(buf) {
+		c := buf[end]
+		if c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '/' {
+			break
+		}
+		end++
+	}
+	if end == 0 {
+		return nil
+	}
+	return &pomTag{
+		name:        string(buf[:end]),
+		closing:     closing,
+		selfClosing: bytes.HasSuffix(bytes.TrimRight(buf, " \t\r\n"), []byte("/")),
+	}
 }
 
 // MavenUpdater 针对 Java/Maven 项目的版本更新实现。
@@ -148,12 +242,10 @@ func pomModules(filePath string) []string {
 	}
 	var mods []string
 	var stack []string
+	scanner := &xmlScanner{}
 	for _, line := range bytes.Split(content, []byte("\n")) {
-		trimmed := strings.TrimSpace(string(line))
-		if trimmed == "" {
-			continue
-		}
-		for _, tg := range scanLineTags(trimmed) {
+		trimmed := string(bytes.TrimSpace(line))
+		for _, tg := range scanner.feed(line) {
 			if !tg.closing && !tg.selfClosing {
 				if tg.name == "module" && len(stack) == 2 &&
 					stack[0] == "project" && stack[1] == "modules" {
@@ -192,12 +284,10 @@ func extractGAV(filePath string, inParent bool) (g, a string) {
 		return "", ""
 	}
 	var stack []string
+	scanner := &xmlScanner{}
 	for _, line := range bytes.Split(content, []byte("\n")) {
 		trimmed := string(bytes.TrimSpace(line))
-		if trimmed == "" {
-			continue
-		}
-		for _, tg := range scanLineTags(trimmed) {
+		for _, tg := range scanner.feed(line) {
 			if tg.closing || tg.selfClosing {
 				if tg.closing && len(stack) > 0 && stack[len(stack)-1] == tg.name {
 					stack = stack[:len(stack)-1]
@@ -260,14 +350,11 @@ func updatePomProjectVersion(filePath, newVersion string) (bool, error) {
 	var stack []string
 	inProject := false
 	updated := false
+	scanner := &xmlScanner{}
 
 	for i, line := range lines {
-		trimmed := string(bytes.TrimSpace(line))
-		if trimmed == "" {
-			continue
-		}
 		replaceVersion := false
-		for _, tg := range scanLineTags(trimmed) {
+		for _, tg := range scanner.feed(line) {
 			if !tg.closing && !tg.selfClosing {
 				if tg.name == "project" {
 					inProject = true
@@ -327,14 +414,11 @@ func updateModulePomVersion(filePath, newVersion, parentGAV string) (bool, error
 	var stack []string
 	inProject := false
 	updated := false
+	scanner := &xmlScanner{}
 
 	for i, line := range lines {
-		trimmed := string(bytes.TrimSpace(line))
-		if trimmed == "" {
-			continue
-		}
 		replaceVersion := false
-		for _, tg := range scanLineTags(trimmed) {
+		for _, tg := range scanner.feed(line) {
 			if !tg.closing && !tg.selfClosing {
 				if tg.name == "project" {
 					inProject = true
