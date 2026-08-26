@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - 添加 --allow-dirty 开关：允许在存在未提交改动时继续发版（默认关闭）
 - release version 1.4.19
+- release version 1.4.19
 
 ## [1.4.18] - 2026-08-26
 ### Changed
