@@ -29,6 +29,43 @@ type Commit struct {
 	Signature object.Signature
 }
 
+// Render 渲染单条提交为 changelog 条目：首行为条目标题，
+// 正文要点统一两空格缩进挂在其下，保持标题与正文的归属关系
+func (c Commit) Render() string {
+	msg := strings.ReplaceAll(c.Message, "\r\n", "\n")
+	summary, body := splitCommitMessage(msg)
+	if body == "" {
+		return "- " + summary
+	}
+	return "- " + summary + "\n" + indentBlock(body)
+}
+
+// splitCommitMessage 将提交信息拆为标题行与正文：
+// 优先按首个空行（\n\n）切分；无空行时按首个换行切分
+func splitCommitMessage(msg string) (summary string, body string) {
+	msg = strings.TrimSpace(msg)
+	if idx := strings.Index(msg, "\n\n"); idx >= 0 {
+		return strings.TrimSpace(msg[:idx]), strings.TrimSpace(msg[idx+2:])
+	}
+	if idx := strings.Index(msg, "\n"); idx >= 0 {
+		return strings.TrimSpace(msg[:idx]), strings.TrimSpace(msg[idx+1:])
+	}
+	return msg, ""
+}
+
+// indentBlock 将多行文本整体缩进两空格；空行保持为空行
+func indentBlock(text string) string {
+	lines := strings.Split(text, "\n")
+	for i, line := range lines {
+		if strings.TrimSpace(line) != "" {
+			lines[i] = "  " + line
+		} else {
+			lines[i] = ""
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
 func fixVersion(tag string) string {
 	version := strings.TrimPrefix(tag, "v")
 	return version

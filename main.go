@@ -158,7 +158,8 @@ func main() {
 	remote := remotes[0]
 	cfg := remote.Config()
 	//fmt.Printf("%+v\n", cfg)
-	repositoryURL := cfg.URLs[0]
+	// 链接形态归一：去掉 remote URL 的 .git 后缀，compare/tag 链接统一指向网页路径
+	repositoryURL := strings.TrimSuffix(cfg.URLs[0], ".git")
 	// 获取HEAD历史记录（遍历当前分支所有可达提交，包含 merge 引入的其他分支提交）
 	headRef, err := r.Head()
 	if err != nil {
