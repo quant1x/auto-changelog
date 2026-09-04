@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.23] - 2026-09-04
+### Changed
+- 改进 CHANGELOG 渲染与链接形态：commit 消息按标题+正文拆分（正文两空格缩进挂标题下），版本段循环改走结构化渲染，remote URL 链接去掉 .git 后缀
+- release version 1.4.23
+
 ## [1.4.22] - 2026-08-26
 ### Changed
 - 修复发版时只执行第一个清单更新器导致 pom.xml 不被更新的问题，并新增回归测试
@@ -566,7 +571,8 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.22...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.23...HEAD
+[1.4.23]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.22...v1.4.23
 [1.4.22]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.21...v1.4.22
 [1.4.21]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.20...v1.4.21
 [1.4.20]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.19...v1.4.20
