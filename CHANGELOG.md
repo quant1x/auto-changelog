@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-11
+### Changed
+- 更新依赖库版本
+- release version 1.5.0
+
 ## [1.4.23] - 2026-09-04
 ### Changed
 - 改进 CHANGELOG 渲染与链接形态：commit 消息按标题+正文拆分（正文两空格缩进挂标题下），版本段循环改走结构化渲染，remote URL 链接去掉 .git 后缀
@@ -32,10 +37,9 @@ All notable changes to this project will be documented in this file.
 ## [1.4.18] - 2026-08-26
 ### Changed
 - 修复 Maven pom.xml 版本更新失效：跨行 project 标签无法识别
-
-将按行正则解析改为流式跨行 XML 标签扫描器，正确处理跨行标签、
-属性值引号、多行注释与 XML 声明，避免真实项目 pom 中多行
-<project> 标签导致版本更新静默失效。新增对应回归测试。
+  将按行正则解析改为流式跨行 XML 标签扫描器，正确处理跨行标签、
+  属性值引号、多行注释与 XML 声明，避免真实项目 pom 中多行
+  <project> 标签导致版本更新静默失效。新增对应回归测试。
 - release version 1.4.18
 
 ## [1.4.17] - 2026-08-26
@@ -97,23 +101,21 @@ All notable changes to this project will be documented in this file.
 ## [1.4.6] - 2026-08-25
 ### Changed
 - 新增 --license 参数：输出第三方许可证信息，保障单一可执行文件合规
-
-- 用 google/go-licenses 收集编译进二进制的依赖许可证，生成 third_party/NOTICE.txt
-  （含各依赖版本、SPDX 许可证标识与许可证全文）
-- go:embed 将 NOTICE.txt 嵌入二进制，--license 运行时输出
-- 新增 license_notice.go 与 NOTICE 生成模板 third_party/notice.tmpl
-- README 补充 --license 用法与重新生成/合规检查命令
+  - 用 google/go-licenses 收集编译进二进制的依赖许可证，生成 third_party/NOTICE.txt
+    （含各依赖版本、SPDX 许可证标识与许可证全文）
+  - go:embed 将 NOTICE.txt 嵌入二进制，--license 运行时输出
+  - 新增 license_notice.go 与 NOTICE 生成模板 third_party/notice.tmpl
+  - README 补充 --license 用法与重新生成/合规检查命令
 - 第三方许可证声明补充 Copyright 与 NOTICE 字段，满足严格法务审计要求
-
-- 新增 tools/noticegen：自研生成器（纯标准库），因 go-licenses report 模板
-  数据源缺少 Copyright/NoticeText 字段
-  - 模块清单取自 go list -deps ./...，与实际编译产物一致
-  - 提取许可证全文、版权声明行（LICENSE 无版权行时从源码头部兜底提取）、
-    NOTICE 文件内容（Apache-2.0 第 4(d) 条要求）
-  - 许可证类型按文本关键词识别 SPDX 标识，支持混合许可（AND 连接）
-- third_party/notice.tmpl 更新为含 Copyright/NoticeText/LicenseText 判空的标准模板
-- 重新生成 third_party/NOTICE.txt：21 个模块均含版权归属与许可证全文
-- README 更新生成与合规检查命令
+  - 新增 tools/noticegen：自研生成器（纯标准库），因 go-licenses report 模板
+    数据源缺少 Copyright/NoticeText 字段
+    - 模块清单取自 go list -deps ./...，与实际编译产物一致
+    - 提取许可证全文、版权声明行（LICENSE 无版权行时从源码头部兜底提取）、
+      NOTICE 文件内容（Apache-2.0 第 4(d) 条要求）
+    - 许可证类型按文本关键词识别 SPDX 标识，支持混合许可（AND 连接）
+  - third_party/notice.tmpl 更新为含 Copyright/NoticeText/LicenseText 判空的标准模板
+  - 重新生成 third_party/NOTICE.txt：21 个模块均含版权归属与许可证全文
+  - README 更新生成与合规检查命令
 - Add markdown NOTICE.md and blank line after module name in third-party notices
 - release v1.4.6
 
@@ -121,34 +123,31 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - 更新 README：新增 --version 用法，补充工作区检查与 Maven 递归支持说明
 - 修复 --version 本地构建输出 Go 推导伪版本的问题
-
-- 通过 BuildInfo.Settings 中的 vcs 设置区分构建方式
-- 本地 git 仓库内构建（带 vcs=git）：一律用 git describe 取当前分支最近可达 tag
-- go install 安装（无 VCS 设置）：使用 Go 工具链嵌入的模块版本
+  - 通过 BuildInfo.Settings 中的 vcs 设置区分构建方式
+  - 本地 git 仓库内构建（带 vcs=git）：一律用 git describe 取当前分支最近可达 tag
+  - go install 安装（无 VCS 设置）：使用 Go 工具链嵌入的模块版本
 - release v1.4.5
 
 ## [1.4.4] - 2026-08-25
 ### Changed
 - 新增 --version 参数：输出当前版本，版本号由 git tag 决定不硬编码
-
-- 优先读取 go 工具链嵌入二进制的模块版本（go install module@vX.Y.Z 场景）
-- 本地构建/仓库内运行时用 git describe --tags --abbrev=0 取当前分支最近可达 tag
-- 裁剪本地 VCS 注入的 "+dirty" 后缀，保持纯 tag 输出
-- 无 tag 时输出初始版本 0.0.0
+  - 优先读取 go 工具链嵌入二进制的模块版本（go install module@vX.Y.Z 场景）
+  - 本地构建/仓库内运行时用 git describe --tags --abbrev=0 取当前分支最近可达 tag
+  - 裁剪本地 VCS 注入的 "+dirty" 后缀，保持纯 tag 输出
+  - 无 tag 时输出初始版本 0.0.0
 - release v1.4.4
 
 ## [1.4.3] - 2026-08-25
 ### Changed
 - 新增 Java Maven 版本更新支持，聚合 POM 按约定路径递归级联
-
-- 新增 version_updater_maven.go：实现 VersionUpdater 接口
-  - 更新根 pom.xml 的 project 直属 <version>
-  - <module> 路径按 pom 声明解析（相对各自 pom 目录），不假设固定目录
-  - BFS 递归遍历嵌套聚合模块，级联同步各模块 <parent> 版本
-  - <parent> GAV 匹配直接父 pom，嵌套场景版本同步正确
-  - 用 XML 栈层级只识别 <project><modules> 直属模块，避免误抓 profile
-- main.go 启用 MavenUpdater
-- version_updater.go 更新调用链注释
+  - 新增 version_updater_maven.go：实现 VersionUpdater 接口
+    - 更新根 pom.xml 的 project 直属 <version>
+    - <module> 路径按 pom 声明解析（相对各自 pom 目录），不假设固定目录
+    - BFS 递归遍历嵌套聚合模块，级联同步各模块 <parent> 版本
+    - <parent> GAV 匹配直接父 pom，嵌套场景版本同步正确
+    - 用 XML 栈层级只识别 <project><modules> 直属模块，避免误抓 profile
+  - main.go 启用 MavenUpdater
+  - version_updater.go 更新调用链注释
 - release v1.4.3
 
 ## [1.4.2] - 2026-08-25
@@ -310,8 +309,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.6] - 2024-06-20
 ### Changed
 - add LICENSE.
-
-Signed-off-by: 王布衣 <wangfengxy@sina.cn>
+  Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 
 ## [1.1.5] - 2024-06-20
 ### Changed
@@ -571,101 +569,102 @@ Signed-off-by: 王布衣 <wangfengxy@sina.cn>
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.23...HEAD
-[1.4.23]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.22...v1.4.23
-[1.4.22]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.21...v1.4.22
-[1.4.21]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.20...v1.4.21
-[1.4.20]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.19...v1.4.20
-[1.4.19]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.18...v1.4.19
-[1.4.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.17...v1.4.18
-[1.4.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.16...v1.4.17
-[1.4.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.15...v1.4.16
-[1.4.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.14...v1.4.15
-[1.4.14]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.13...v1.4.14
-[1.4.13]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.12...v1.4.13
-[1.4.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.11...v1.4.12
-[1.4.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.10...v1.4.11
-[1.4.10]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.9...v1.4.10
-[1.4.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.8...v1.4.9
-[1.4.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.7...v1.4.8
-[1.4.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.6...v1.4.7
-[1.4.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.5...v1.4.6
-[1.4.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.4...v1.4.5
-[1.4.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.3...v1.4.4
-[1.4.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.2...v1.4.3
-[1.4.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.1...v1.4.2
-[1.4.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.4.0...v1.4.1
-[1.4.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.6...v1.4.0
-[1.3.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.5...v1.3.6
-[1.3.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.4...v1.3.5
-[1.3.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.3...v1.3.4
-[1.3.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.2...v1.3.3
-[1.3.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.1...v1.3.2
-[1.3.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.3.0...v1.3.1
-[1.3.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.5...v1.3.0
-[1.2.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.4...v1.2.5
-[1.2.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.3...v1.2.4
-[1.2.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.2...v1.2.3
-[1.2.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.1...v1.2.2
-[1.2.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.2.0...v1.2.1
-[1.2.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.18...v1.2.0
-[1.1.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.17...v1.1.18
-[1.1.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.16...v1.1.17
-[1.1.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.15...v1.1.16
-[1.1.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.14...v1.1.15
-[1.1.14]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.13...v1.1.14
-[1.1.13]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.12...v1.1.13
-[1.1.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.11...v1.1.12
-[1.1.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.10...v1.1.11
-[1.1.10]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.9...v1.1.10
-[1.1.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.8...v1.1.9
-[1.1.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.7...v1.1.8
-[1.1.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.6...v1.1.7
-[1.1.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.5...v1.1.6
-[1.1.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.4...v1.1.5
-[1.1.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.3...v1.1.4
-[1.1.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.2...v1.1.3
-[1.1.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.1...v1.1.2
-[1.1.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.1.0...v1.1.1
-[1.1.0]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.39...v1.1.0
-[1.0.39]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.38...v1.0.39
-[1.0.38]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.37...v1.0.38
-[1.0.37]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.36...v1.0.37
-[1.0.36]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.35...v1.0.36
-[1.0.35]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.34...v1.0.35
-[1.0.34]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.33...v1.0.34
-[1.0.33]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.32...v1.0.33
-[1.0.32]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.31...v1.0.32
-[1.0.31]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.30...v1.0.31
-[1.0.30]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.29...v1.0.30
-[1.0.29]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.28...v1.0.29
-[1.0.28]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.27...v1.0.28
-[1.0.27]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.26...v1.0.27
-[1.0.26]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.25...v1.0.26
-[1.0.25]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.24...v1.0.25
-[1.0.24]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.23...v1.0.24
-[1.0.23]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.22...v1.0.23
-[1.0.22]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.21...v1.0.22
-[1.0.21]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.20...v1.0.21
-[1.0.20]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.19...v1.0.20
-[1.0.19]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.18...v1.0.19
-[1.0.18]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.17...v1.0.18
-[1.0.17]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.16...v1.0.17
-[1.0.16]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.15...v1.0.16
-[1.0.15]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.14...v1.0.15
-[1.0.14]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.13...v1.0.14
-[1.0.13]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.12...v1.0.13
-[1.0.12]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.11...v1.0.12
-[1.0.11]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.10...v1.0.11
-[1.0.10]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.9...v1.0.10
-[1.0.9]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.8...v1.0.9
-[1.0.8]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.7...v1.0.8
-[1.0.7]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.6...v1.0.7
-[1.0.6]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.5...v1.0.6
-[1.0.5]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.4...v1.0.5
-[1.0.4]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.3...v1.0.4
-[1.0.3]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.2...v1.0.3
-[1.0.2]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.1...v1.0.2
-[1.0.1]: https://gitee.com/quant1x/autochangelog.git/compare/v1.0.0...v1.0.1
+[Unreleased]: https://gitee.com/quant1x/autochangelog/compare/v1.5.0...HEAD
+[1.5.0]: https://gitee.com/quant1x/autochangelog/compare/v1.4.23...v1.5.0
+[1.4.23]: https://gitee.com/quant1x/autochangelog/compare/v1.4.22...v1.4.23
+[1.4.22]: https://gitee.com/quant1x/autochangelog/compare/v1.4.21...v1.4.22
+[1.4.21]: https://gitee.com/quant1x/autochangelog/compare/v1.4.20...v1.4.21
+[1.4.20]: https://gitee.com/quant1x/autochangelog/compare/v1.4.19...v1.4.20
+[1.4.19]: https://gitee.com/quant1x/autochangelog/compare/v1.4.18...v1.4.19
+[1.4.18]: https://gitee.com/quant1x/autochangelog/compare/v1.4.17...v1.4.18
+[1.4.17]: https://gitee.com/quant1x/autochangelog/compare/v1.4.16...v1.4.17
+[1.4.16]: https://gitee.com/quant1x/autochangelog/compare/v1.4.15...v1.4.16
+[1.4.15]: https://gitee.com/quant1x/autochangelog/compare/v1.4.14...v1.4.15
+[1.4.14]: https://gitee.com/quant1x/autochangelog/compare/v1.4.13...v1.4.14
+[1.4.13]: https://gitee.com/quant1x/autochangelog/compare/v1.4.12...v1.4.13
+[1.4.12]: https://gitee.com/quant1x/autochangelog/compare/v1.4.11...v1.4.12
+[1.4.11]: https://gitee.com/quant1x/autochangelog/compare/v1.4.10...v1.4.11
+[1.4.10]: https://gitee.com/quant1x/autochangelog/compare/v1.4.9...v1.4.10
+[1.4.9]: https://gitee.com/quant1x/autochangelog/compare/v1.4.8...v1.4.9
+[1.4.8]: https://gitee.com/quant1x/autochangelog/compare/v1.4.7...v1.4.8
+[1.4.7]: https://gitee.com/quant1x/autochangelog/compare/v1.4.6...v1.4.7
+[1.4.6]: https://gitee.com/quant1x/autochangelog/compare/v1.4.5...v1.4.6
+[1.4.5]: https://gitee.com/quant1x/autochangelog/compare/v1.4.4...v1.4.5
+[1.4.4]: https://gitee.com/quant1x/autochangelog/compare/v1.4.3...v1.4.4
+[1.4.3]: https://gitee.com/quant1x/autochangelog/compare/v1.4.2...v1.4.3
+[1.4.2]: https://gitee.com/quant1x/autochangelog/compare/v1.4.1...v1.4.2
+[1.4.1]: https://gitee.com/quant1x/autochangelog/compare/v1.4.0...v1.4.1
+[1.4.0]: https://gitee.com/quant1x/autochangelog/compare/v1.3.6...v1.4.0
+[1.3.6]: https://gitee.com/quant1x/autochangelog/compare/v1.3.5...v1.3.6
+[1.3.5]: https://gitee.com/quant1x/autochangelog/compare/v1.3.4...v1.3.5
+[1.3.4]: https://gitee.com/quant1x/autochangelog/compare/v1.3.3...v1.3.4
+[1.3.3]: https://gitee.com/quant1x/autochangelog/compare/v1.3.2...v1.3.3
+[1.3.2]: https://gitee.com/quant1x/autochangelog/compare/v1.3.1...v1.3.2
+[1.3.1]: https://gitee.com/quant1x/autochangelog/compare/v1.3.0...v1.3.1
+[1.3.0]: https://gitee.com/quant1x/autochangelog/compare/v1.2.5...v1.3.0
+[1.2.5]: https://gitee.com/quant1x/autochangelog/compare/v1.2.4...v1.2.5
+[1.2.4]: https://gitee.com/quant1x/autochangelog/compare/v1.2.3...v1.2.4
+[1.2.3]: https://gitee.com/quant1x/autochangelog/compare/v1.2.2...v1.2.3
+[1.2.2]: https://gitee.com/quant1x/autochangelog/compare/v1.2.1...v1.2.2
+[1.2.1]: https://gitee.com/quant1x/autochangelog/compare/v1.2.0...v1.2.1
+[1.2.0]: https://gitee.com/quant1x/autochangelog/compare/v1.1.18...v1.2.0
+[1.1.18]: https://gitee.com/quant1x/autochangelog/compare/v1.1.17...v1.1.18
+[1.1.17]: https://gitee.com/quant1x/autochangelog/compare/v1.1.16...v1.1.17
+[1.1.16]: https://gitee.com/quant1x/autochangelog/compare/v1.1.15...v1.1.16
+[1.1.15]: https://gitee.com/quant1x/autochangelog/compare/v1.1.14...v1.1.15
+[1.1.14]: https://gitee.com/quant1x/autochangelog/compare/v1.1.13...v1.1.14
+[1.1.13]: https://gitee.com/quant1x/autochangelog/compare/v1.1.12...v1.1.13
+[1.1.12]: https://gitee.com/quant1x/autochangelog/compare/v1.1.11...v1.1.12
+[1.1.11]: https://gitee.com/quant1x/autochangelog/compare/v1.1.10...v1.1.11
+[1.1.10]: https://gitee.com/quant1x/autochangelog/compare/v1.1.9...v1.1.10
+[1.1.9]: https://gitee.com/quant1x/autochangelog/compare/v1.1.8...v1.1.9
+[1.1.8]: https://gitee.com/quant1x/autochangelog/compare/v1.1.7...v1.1.8
+[1.1.7]: https://gitee.com/quant1x/autochangelog/compare/v1.1.6...v1.1.7
+[1.1.6]: https://gitee.com/quant1x/autochangelog/compare/v1.1.5...v1.1.6
+[1.1.5]: https://gitee.com/quant1x/autochangelog/compare/v1.1.4...v1.1.5
+[1.1.4]: https://gitee.com/quant1x/autochangelog/compare/v1.1.3...v1.1.4
+[1.1.3]: https://gitee.com/quant1x/autochangelog/compare/v1.1.2...v1.1.3
+[1.1.2]: https://gitee.com/quant1x/autochangelog/compare/v1.1.1...v1.1.2
+[1.1.1]: https://gitee.com/quant1x/autochangelog/compare/v1.1.0...v1.1.1
+[1.1.0]: https://gitee.com/quant1x/autochangelog/compare/v1.0.39...v1.1.0
+[1.0.39]: https://gitee.com/quant1x/autochangelog/compare/v1.0.38...v1.0.39
+[1.0.38]: https://gitee.com/quant1x/autochangelog/compare/v1.0.37...v1.0.38
+[1.0.37]: https://gitee.com/quant1x/autochangelog/compare/v1.0.36...v1.0.37
+[1.0.36]: https://gitee.com/quant1x/autochangelog/compare/v1.0.35...v1.0.36
+[1.0.35]: https://gitee.com/quant1x/autochangelog/compare/v1.0.34...v1.0.35
+[1.0.34]: https://gitee.com/quant1x/autochangelog/compare/v1.0.33...v1.0.34
+[1.0.33]: https://gitee.com/quant1x/autochangelog/compare/v1.0.32...v1.0.33
+[1.0.32]: https://gitee.com/quant1x/autochangelog/compare/v1.0.31...v1.0.32
+[1.0.31]: https://gitee.com/quant1x/autochangelog/compare/v1.0.30...v1.0.31
+[1.0.30]: https://gitee.com/quant1x/autochangelog/compare/v1.0.29...v1.0.30
+[1.0.29]: https://gitee.com/quant1x/autochangelog/compare/v1.0.28...v1.0.29
+[1.0.28]: https://gitee.com/quant1x/autochangelog/compare/v1.0.27...v1.0.28
+[1.0.27]: https://gitee.com/quant1x/autochangelog/compare/v1.0.26...v1.0.27
+[1.0.26]: https://gitee.com/quant1x/autochangelog/compare/v1.0.25...v1.0.26
+[1.0.25]: https://gitee.com/quant1x/autochangelog/compare/v1.0.24...v1.0.25
+[1.0.24]: https://gitee.com/quant1x/autochangelog/compare/v1.0.23...v1.0.24
+[1.0.23]: https://gitee.com/quant1x/autochangelog/compare/v1.0.22...v1.0.23
+[1.0.22]: https://gitee.com/quant1x/autochangelog/compare/v1.0.21...v1.0.22
+[1.0.21]: https://gitee.com/quant1x/autochangelog/compare/v1.0.20...v1.0.21
+[1.0.20]: https://gitee.com/quant1x/autochangelog/compare/v1.0.19...v1.0.20
+[1.0.19]: https://gitee.com/quant1x/autochangelog/compare/v1.0.18...v1.0.19
+[1.0.18]: https://gitee.com/quant1x/autochangelog/compare/v1.0.17...v1.0.18
+[1.0.17]: https://gitee.com/quant1x/autochangelog/compare/v1.0.16...v1.0.17
+[1.0.16]: https://gitee.com/quant1x/autochangelog/compare/v1.0.15...v1.0.16
+[1.0.15]: https://gitee.com/quant1x/autochangelog/compare/v1.0.14...v1.0.15
+[1.0.14]: https://gitee.com/quant1x/autochangelog/compare/v1.0.13...v1.0.14
+[1.0.13]: https://gitee.com/quant1x/autochangelog/compare/v1.0.12...v1.0.13
+[1.0.12]: https://gitee.com/quant1x/autochangelog/compare/v1.0.11...v1.0.12
+[1.0.11]: https://gitee.com/quant1x/autochangelog/compare/v1.0.10...v1.0.11
+[1.0.10]: https://gitee.com/quant1x/autochangelog/compare/v1.0.9...v1.0.10
+[1.0.9]: https://gitee.com/quant1x/autochangelog/compare/v1.0.8...v1.0.9
+[1.0.8]: https://gitee.com/quant1x/autochangelog/compare/v1.0.7...v1.0.8
+[1.0.7]: https://gitee.com/quant1x/autochangelog/compare/v1.0.6...v1.0.7
+[1.0.6]: https://gitee.com/quant1x/autochangelog/compare/v1.0.5...v1.0.6
+[1.0.5]: https://gitee.com/quant1x/autochangelog/compare/v1.0.4...v1.0.5
+[1.0.4]: https://gitee.com/quant1x/autochangelog/compare/v1.0.3...v1.0.4
+[1.0.3]: https://gitee.com/quant1x/autochangelog/compare/v1.0.2...v1.0.3
+[1.0.2]: https://gitee.com/quant1x/autochangelog/compare/v1.0.1...v1.0.2
+[1.0.1]: https://gitee.com/quant1x/autochangelog/compare/v1.0.0...v1.0.1
 
-[1.0.0]: https://gitee.com/quant1x/autochangelog.git/releases/tag/v1.0.0
+[1.0.0]: https://gitee.com/quant1x/autochangelog/releases/tag/v1.0.0
