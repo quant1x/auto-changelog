@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-10-11
+### Changed
+- fix[mod]: 修改模块仓库, 从gitee改成github
+- release version 1.5.1
+
 ## [1.5.0] - 2026-10-11
 ### Changed
 - 更新依赖库版本
@@ -569,7 +574,8 @@ All notable changes to this project will be documented in this file.
 - add README
 
 
-[Unreleased]: https://gitee.com/quant1x/autochangelog/compare/v1.5.0...HEAD
+[Unreleased]: https://gitee.com/quant1x/autochangelog/compare/v1.5.1...HEAD
+[1.5.1]: https://gitee.com/quant1x/autochangelog/compare/v1.5.0...v1.5.1
 [1.5.0]: https://gitee.com/quant1x/autochangelog/compare/v1.4.23...v1.5.0
 [1.4.23]: https://gitee.com/quant1x/autochangelog/compare/v1.4.22...v1.4.23
 [1.4.22]: https://gitee.com/quant1x/autochangelog/compare/v1.4.21...v1.4.22
