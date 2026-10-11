@@ -12,13 +12,13 @@ AutoChangeLog 是一个用于自动为 git 仓库生成和维护 CHANGELOG.md，
 使用 Go 工具链安装（需要 Go 1.27 及以上版本）：
 
 ```shell
-go install gitee.com/quant1x/autochangelog@latest
+go install github.com/quant1x/auto-changelog@latest
 ```
 
 如需安装指定版本，可将 `@latest` 替换为版本号，例如：
 
 ```shell
-go install gitee.com/quant1x/autochangelog@v1.4.3
+go install github.com/quant1x/auto-changelog@v1.4.3
 ```
 
 ## 构建
@@ -99,7 +99,7 @@ go run ./tools/noticegen
 
 ```shell
 go run github.com/google/go-licenses@latest check ./... \
-  --ignore gitee.com/quant1x/autochangelog
+  --ignore github.com/quant1x/auto-changelog
 ```
 
 ## 其他

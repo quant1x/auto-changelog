@@ -9,7 +9,7 @@ import _ "embed"
 //
 //	go run github.com/google/go-licenses@latest report ./... \
 //	  --template third_party/notice.tmpl \
-//	  --ignore gitee.com/quant1x/autochangelog > third_party/NOTICE.txt
+//	  --ignore github.com/quant1x/auto-changelog > third_party/NOTICE.txt
 //
 //go:embed third_party/NOTICE.txt
 var noticesText string

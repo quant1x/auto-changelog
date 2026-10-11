@@ -26,7 +26,7 @@ import (
 	"text/template"
 )
 
-const mainModule = "gitee.com/quant1x/autochangelog"
+const mainModule = "github.com/quant1x/auto-changelog"
 
 // output 描述一次模板渲染：源模板与目标输出文件
 var outputs = []struct {

@@ -1,4 +1,4 @@
-module gitee.com/quant1x/autochangelog
+module github.com/quant1x/auto-changelog
 
 go 1.27.2
 
