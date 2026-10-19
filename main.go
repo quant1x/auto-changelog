@@ -366,6 +366,7 @@ func main() {
 	if !*refreshFlag {
 		if err := runVersionUpdate([]VersionUpdater{
 			NewCargoUpdater(currentPath),
+			NewZigUpdater(currentPath),
 			NewMavenUpdater(currentPath),
 		}, newVersion, worktree); err != nil {
 			fatal(err)

@@ -17,6 +17,10 @@ import (
 //	      │    └─ Update ──► 更新 Cargo.toml ──► cargo check 刷新 Cargo.lock
 //	      │                                   └─► 返回 [Cargo.toml, Cargo.lock]
 //	      │
+//	      ├─ ZigUpdater（Zig）      Supported: 存在 build.zig.zon
+//	      │    └─ Update ──► 更新 build.zig.zon 顶层 .version
+//	      │                  └─► 返回 [build.zig.zon]
+//	      │
 //	      └─ MavenUpdater（Java）   Supported: 存在 pom.xml
 //	           └─ Update ──► 更新 pom.xml 的 project 直属 <version>
 //	                         └─► 返回 [pom.xml]

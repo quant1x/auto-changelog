@@ -79,6 +79,7 @@ go build -o autochangelog.exe
 - 工作区存在未提交改动时提示退出，避免生成结果不准确
 - 支持主版本、次版本、修订版本递增，默认 patch
 - 存在 Cargo.toml 时同步更新其版本号，并刷新 Cargo.lock
+- 存在 build.zig.zon 时同步更新其顶层 `.version`（`.fingerprint` 由包名派生，不随版本变化）
 - 存在 pom.xml 时同步更新其版本号；聚合（multi-module）项目按 `<modules>` 声明的相对路径递归级联，同步各子模块 `<parent>` 版本（嵌套聚合同样支持，不依赖 src 等固定目录）
 
 ## 第三方许可证合规
